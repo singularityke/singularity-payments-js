@@ -4,6 +4,7 @@ import {
   MpesaCallbackHandler,
   CallbackHandlerOptions,
   ParsedCallbackData,
+  ParsedC2BCallback,
 } from "../utils/callback";
 import {
   STKPushRequest,
@@ -11,7 +12,9 @@ import {
   TransactionStatusRequest,
   TransactionStatusResponse,
   C2BRegisterRequest,
+  C2BRegisterResponse,
   STKCallback,
+  C2BCallback,
 } from "../types/mpesa";
 
 export class MpesaClient {
@@ -26,17 +29,23 @@ export class MpesaClient {
     this.callbackHandler = new MpesaCallbackHandler(callbackOptions);
   }
 
+  /**
+   * Add a plugin to extend functionality
+   */
   use(plugin: MpesaPlugin): this {
     this.plugins.push(plugin);
     plugin.init(this);
     return this;
   }
 
+  /**
+   * Initiate STK Push (Lipa Na M-Pesa Online)
+   */
   async stkPush(request: STKPushRequest): Promise<STKPushResponse> {
     const token = await this.auth.getAccessToken();
     const baseUrl = this.auth.getBaseUrl();
 
-    // Format phone number (remove + or leading 254, ensure it starts with 254)
+    // Format phone number
     let phone = request.phoneNumber.replace(/[\s\-\+]/g, "");
     if (phone.startsWith("0")) {
       phone = "254" + phone.substring(1);
@@ -44,12 +53,17 @@ export class MpesaClient {
       phone = "254" + phone;
     }
 
+    // Validate amount
+    if (request.amount < 1) {
+      throw new Error("Amount must be at least 1 KES");
+    }
+
     const payload = {
       BusinessShortCode: this.config.shortcode,
       Password: this.auth.getPassword(),
       Timestamp: this.auth.getTimestamp(),
       TransactionType: "CustomerPayBillOnline",
-      Amount: request.amount,
+      Amount: Math.floor(request.amount),
       PartyA: phone,
       PartyB: this.config.shortcode,
       PhoneNumber: phone,
@@ -75,6 +89,9 @@ export class MpesaClient {
     return (await response.json()) as STKPushResponse;
   }
 
+  /**
+   * Query STK Push transaction status
+   */
   async stkQuery(
     request: TransactionStatusRequest,
   ): Promise<TransactionStatusResponse> {
@@ -105,7 +122,12 @@ export class MpesaClient {
     return (await response.json()) as TransactionStatusResponse;
   }
 
-  async registerC2BUrl(request: C2BRegisterRequest): Promise<any> {
+  /**
+   * Register C2B URLs for validation and confirmation
+   */
+  async registerC2BUrl(
+    request: C2BRegisterRequest,
+  ): Promise<C2BRegisterResponse> {
     const token = await this.auth.getAccessToken();
     const baseUrl = this.auth.getBaseUrl();
 
@@ -130,18 +152,21 @@ export class MpesaClient {
       throw new Error(`C2B registration failed: ${error}`);
     }
 
-    return await response.json();
+    return (await response.json()) as C2BRegisterResponse;
   }
 
-  getConfig(): MpesaConfig {
-    return this.config;
-  }
-
+  /**
+   * Get the callback handler instance
+   */
   getCallbackHandler(): MpesaCallbackHandler {
     return this.callbackHandler;
   }
 
-  async handleCallback(
+  /**
+   * Handle an incoming STK Push callback
+   * Returns M-Pesa compliant response
+   */
+  async handleSTKCallback(
     callback: STKCallback,
     ipAddress?: string,
   ): Promise<object> {
@@ -149,12 +174,67 @@ export class MpesaClient {
       await this.callbackHandler.handleCallback(callback, ipAddress);
       return this.callbackHandler.createCallbackResponse(true);
     } catch (error) {
-      console.error("Error handling callback:", error);
-      return this.callbackHandler.createCallbackResponse(false);
+      console.error("STK Callback handling error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Internal error",
+      );
     }
   }
 
-  parseCallback(callback: STKCallback): ParsedCallbackData {
+  /**
+   * Handle C2B validation request
+   */
+  async handleC2BValidation(callback: C2BCallback): Promise<object> {
+    try {
+      const isValid = await this.callbackHandler.handleC2BValidation(callback);
+      return this.callbackHandler.createCallbackResponse(
+        isValid,
+        isValid ? "Accepted" : "Rejected",
+      );
+    } catch (error) {
+      console.error("C2B Validation error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Validation failed",
+      );
+    }
+  }
+
+  /**
+   * Handle C2B confirmation
+   */
+  async handleC2BConfirmation(callback: C2BCallback): Promise<object> {
+    try {
+      await this.callbackHandler.handleC2BConfirmation(callback);
+      return this.callbackHandler.createCallbackResponse(true);
+    } catch (error) {
+      console.error("C2B Confirmation error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Processing failed",
+      );
+    }
+  }
+
+  /**
+   * Parse STK callback without handling (for testing)
+   */
+  parseSTKCallback(callback: STKCallback): ParsedCallbackData {
     return this.callbackHandler.parseCallback(callback);
+  }
+
+  /**
+   * Parse C2B callback without handling ( for testing)
+   */
+  parseC2BCallback(callback: C2BCallback): ParsedC2BCallback {
+    return this.callbackHandler.parseC2BCallback(callback);
+  }
+
+  /**
+   * Get configuration (I want this for plugins)
+   */
+  getConfig(): MpesaConfig {
+    return this.config;
   }
 }
