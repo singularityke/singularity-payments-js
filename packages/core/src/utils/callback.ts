@@ -1,4 +1,4 @@
-import { STKCallback, CallbackMetadata } from "../types/mpesa";
+import { STKCallback, CallbackMetadata, C2BCallback } from "../types/mpesa";
 
 export interface ParsedCallbackData {
   merchantRequestId: string;
@@ -9,20 +9,44 @@ export interface ParsedCallbackData {
   mpesaReceiptNumber?: string;
   transactionDate?: string;
   phoneNumber?: string;
+  isSuccess: boolean;
+  errorMessage?: string;
+}
+
+export interface ParsedC2BCallback {
+  transactionType: string;
+  transactionId: string;
+  transactionTime: string;
+  amount: number;
+  businessShortCode: string;
+  billRefNumber: string;
+  invoiceNumber?: string;
+  msisdn: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
 }
 
 export interface CallbackHandlerOptions {
   onSuccess?: (data: ParsedCallbackData) => void | Promise<void>;
   onFailure?: (data: ParsedCallbackData) => void | Promise<void>;
   onCallback?: (data: ParsedCallbackData) => void | Promise<void>;
+  onC2BConfirmation?: (data: ParsedC2BCallback) => void | Promise<void>;
+  onC2BValidation?: (data: ParsedC2BCallback) => Promise<boolean>;
   validateIp?: boolean;
   allowedIps?: string[];
+  isDuplicate?: (checkoutRequestId: string) => boolean | Promise<boolean>;
+  logger?: {
+    info: (message: string, data?: any) => void;
+    error: (message: string, data?: any) => void;
+    warn: (message: string, data?: any) => void;
+  };
 }
 
 export class MpesaCallbackHandler {
   private options: CallbackHandlerOptions;
 
-  // Safaricom IPs from Daraja website, we should verify these periodically - https://developer.safaricom.co.ke/dashboard/apis?api=GettingStarted
+  // Safaricom's known IP ranges (periodically updated) - Link(https://developer.safaricom.co.ke/dashboard/apis?api=GettingStarted)
   private readonly SAFARICOM_IPS = [
     "196.201.214.200",
     "196.201.214.206",
@@ -47,7 +71,7 @@ export class MpesaCallbackHandler {
   }
 
   /**
-   * Validate that the callback is from a Safaricom IP
+   * Validate that the callback is from a trusted IP
    */
   validateCallbackIp(ipAddress: string): boolean {
     if (!this.options.validateIp) {
@@ -59,7 +83,7 @@ export class MpesaCallbackHandler {
   }
 
   /**
-   * Parse the callback data from M-Pesa
+   * Parse STK Push callback data from M-Pesa
    */
   parseCallback(callback: STKCallback): ParsedCallbackData {
     const stkCallback = callback.Body.stkCallback;
@@ -69,6 +93,11 @@ export class MpesaCallbackHandler {
       checkoutRequestId: stkCallback.CheckoutRequestID,
       resultCode: stkCallback.ResultCode,
       resultDescription: stkCallback.ResultDesc,
+      isSuccess: stkCallback.ResultCode === 0,
+      errorMessage:
+        stkCallback.ResultCode !== 0
+          ? this.getErrorMessage(stkCallback.ResultCode)
+          : undefined,
     };
 
     // If transaction was successful, parse metadata
@@ -81,7 +110,26 @@ export class MpesaCallbackHandler {
   }
 
   /**
-   * Extract metadata from callback
+   * Parse C2B callback data
+   */
+  parseC2BCallback(callback: C2BCallback): ParsedC2BCallback {
+    return {
+      transactionType: callback.TransactionType,
+      transactionId: callback.TransID,
+      transactionTime: callback.TransTime,
+      amount: parseFloat(callback.TransAmount),
+      businessShortCode: callback.BusinessShortCode,
+      billRefNumber: callback.BillRefNumber,
+      invoiceNumber: callback.InvoiceNumber,
+      msisdn: callback.MSISDN,
+      firstName: callback.FirstName,
+      middleName: callback.MiddleName,
+      lastName: callback.LastName,
+    };
+  }
+
+  /**
+   * Extract metadata from STK callback
    */
   private extractMetadata(
     metadata: CallbackMetadata,
@@ -97,7 +145,9 @@ export class MpesaCallbackHandler {
           result.mpesaReceiptNumber = String(item.Value);
           break;
         case "TransactionDate":
-          result.transactionDate = String(item.Value);
+          result.transactionDate = this.formatTransactionDate(
+            String(item.Value),
+          );
           break;
         case "PhoneNumber":
           result.phoneNumber = String(item.Value);
@@ -106,6 +156,21 @@ export class MpesaCallbackHandler {
     });
 
     return result;
+  }
+
+  /**
+   * Format transaction date from M-Pesa format (YYYYMMDDHHmmss) to ISO
+   */
+  private formatTransactionDate(dateStr: string): string {
+    // Format: 20251222144900 -> 2025-12-22T14:49:00
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    const hours = dateStr.substring(8, 10);
+    const minutes = dateStr.substring(10, 12);
+    const seconds = dateStr.substring(12, 14);
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   }
 
   /**
@@ -123,20 +188,20 @@ export class MpesaCallbackHandler {
   }
 
   /**
-   * Get more readable error message based on result code
+   * Get a readable error message based on the code
    */
   getErrorMessage(resultCode: number): string {
     const errorMessages: Record<number, string> = {
       0: "Success",
-      1: "Insufficient funds",
-      17: "User cancelled transaction",
+      1: "Insufficient funds in M-Pesa account",
+      17: "User cancelled the transaction",
       26: "System internal error",
       1001: "Unable to lock subscriber, a transaction is already in process",
       1019: "Transaction expired. No response from user",
       1032: "Request cancelled by user",
-      1037: "Timeout in sending PIN",
+      1037: "Timeout in sending PIN request",
       2001: "Wrong PIN entered",
-      9999: "Request cancelled",
+      9999: "Request cancelled by user",
     };
 
     return (
@@ -145,7 +210,7 @@ export class MpesaCallbackHandler {
   }
 
   /**
-   * Handle the callback and invoke appropriate handlers
+   * Handle STK Push callback and invoke appropriate handlers
    */
   async handleCallback(
     callback: STKCallback,
@@ -153,18 +218,35 @@ export class MpesaCallbackHandler {
   ): Promise<void> {
     // Validate IP if provided
     if (ipAddress && !this.validateCallbackIp(ipAddress)) {
+      this.log("warn", `Invalid callback IP: ${ipAddress}`);
       throw new Error(`Invalid callback IP: ${ipAddress}`);
     }
 
     // Parse the callback
     const parsed = this.parseCallback(callback);
 
+    this.log("info", "Processing STK callback", {
+      checkoutRequestId: parsed.checkoutRequestId,
+      resultCode: parsed.resultCode,
+    });
+
+    // Check for duplicates if handler provided
+    if (this.options.isDuplicate) {
+      const isDupe = await this.options.isDuplicate(parsed.checkoutRequestId);
+      if (isDupe) {
+        this.log("warn", "Duplicate callback detected", {
+          checkoutRequestId: parsed.checkoutRequestId,
+        });
+        return; // Silently ignore duplicates
+      }
+    }
+
     // Call the general callback handler if provided
     if (this.options.onCallback) {
       await this.options.onCallback(parsed);
     }
 
-    // Call specific handlers based on success or failure
+    // Call specific handlers based on success/failure
     if (this.isSuccess(parsed) && this.options.onSuccess) {
       await this.options.onSuccess(parsed);
     } else if (this.isFailure(parsed) && this.options.onFailure) {
@@ -173,12 +255,57 @@ export class MpesaCallbackHandler {
   }
 
   /**
-   * Create a standard callback response for m-pesa
+   * Handle C2B validation request
+   * Returns true if validation passes, false otherwise
    */
-  createCallbackResponse(success: boolean = true): object {
+  async handleC2BValidation(callback: C2BCallback): Promise<boolean> {
+    this.log("info", "Processing C2B validation", {
+      transactionId: callback.TransID,
+    });
+
+    if (this.options.onC2BValidation) {
+      return await this.options.onC2BValidation(
+        this.parseC2BCallback(callback),
+      );
+    }
+
+    // Default: accept all transactions
+    return true;
+  }
+
+  /**
+   * Handle C2B confirmation
+   */
+  async handleC2BConfirmation(callback: C2BCallback): Promise<void> {
+    this.log("info", "Processing C2B confirmation", {
+      transactionId: callback.TransID,
+    });
+
+    if (this.options.onC2BConfirmation) {
+      await this.options.onC2BConfirmation(this.parseC2BCallback(callback));
+    }
+  }
+
+  /**
+   * Create a standard callback response for M-Pesa
+   */
+  createCallbackResponse(success: boolean = true, message?: string): object {
     return {
       ResultCode: success ? 0 : 1,
-      ResultDesc: success ? "Accepted" : "Rejected",
+      ResultDesc: message || (success ? "Accepted" : "Rejected"),
     };
+  }
+
+  /**
+   * Internal logging helper
+   */
+  private log(
+    level: "info" | "error" | "warn",
+    message: string,
+    data?: any,
+  ): void {
+    if (this.options.logger) {
+      this.options.logger[level](message, data);
+    }
   }
 }

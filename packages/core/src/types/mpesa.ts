@@ -52,3 +52,24 @@ export interface STKCallback {
     };
   };
 }
+export interface C2BCallback {
+  TransactionType: string;
+  TransID: string;
+  TransTime: string;
+  TransAmount: string;
+  BusinessShortCode: string;
+  BillRefNumber: string;
+  InvoiceNumber?: string;
+  OrgAccountBalance?: string;
+  ThirdPartyTransID?: string;
+  MSISDN: string;
+  FirstName?: string;
+  MiddleName?: string;
+  LastName?: string;
+}
+
+export interface C2BRegisterResponse {
+  OriginatorCoversationID: string;
+  ResponseCode: string;
+  ResponseDescription: string;
+}
