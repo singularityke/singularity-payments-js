@@ -1,21 +1,29 @@
 import { MpesaConfig, MpesaPlugin } from "../types/config";
 import { MpesaAuth } from "../utils/auth";
 import {
+  MpesaCallbackHandler,
+  CallbackHandlerOptions,
+  ParsedCallbackData,
+} from "../utils/callback";
+import {
   STKPushRequest,
   STKPushResponse,
   TransactionStatusRequest,
   TransactionStatusResponse,
   C2BRegisterRequest,
+  STKCallback,
 } from "../types/mpesa";
 
 export class MpesaClient {
   private config: MpesaConfig;
   private auth: MpesaAuth;
   private plugins: MpesaPlugin[] = [];
+  private callbackHandler: MpesaCallbackHandler;
 
-  constructor(config: MpesaConfig) {
+  constructor(config: MpesaConfig, callbackOptions?: CallbackHandlerOptions) {
     this.config = config;
     this.auth = new MpesaAuth(config);
+    this.callbackHandler = new MpesaCallbackHandler(callbackOptions);
   }
 
   use(plugin: MpesaPlugin): this {
@@ -127,5 +135,26 @@ export class MpesaClient {
 
   getConfig(): MpesaConfig {
     return this.config;
+  }
+
+  getCallbackHandler(): MpesaCallbackHandler {
+    return this.callbackHandler;
+  }
+
+  async handleCallback(
+    callback: STKCallback,
+    ipAddress?: string,
+  ): Promise<object> {
+    try {
+      await this.callbackHandler.handleCallback(callback, ipAddress);
+      return this.callbackHandler.createCallbackResponse(true);
+    } catch (error) {
+      console.error("Error handling callback:", error);
+      return this.callbackHandler.createCallbackResponse(false);
+    }
+  }
+
+  parseCallback(callback: STKCallback): ParsedCallbackData {
+    return this.callbackHandler.parseCallback(callback);
   }
 }
