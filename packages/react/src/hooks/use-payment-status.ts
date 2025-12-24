@@ -5,65 +5,14 @@ import { PaymentStatus, PaymentState } from "../types";
 import { useMpesaConfig } from "../provider";
 
 export interface UsePaymentStatusOptions {
-  /**
-   * Checkout request ID to poll
-   */
-  checkoutRequestId: string | null;
-
-  /**
-   * Start polling automatically
-   * @default true
-   */
+  CheckoutRequestID: string | null;
   enabled?: boolean;
-
-  /**
-   * Called when payment succeeds
-   */
   onSuccess?: (status: PaymentStatus) => void;
-
-  /**
-   * Called when payment fails
-   */
   onFailure?: (status: PaymentStatus) => void;
-
-  /**
-   * Called when polling times out
-   */
   onTimeout?: () => void;
-
-  /**
-   * Custom polling endpoint
-   * @default "{baseUrl}/stk-query"
-   */
   endpoint?: string;
 }
 
-/**
- * Hook for polling M-Pesa payment status
- *
- * @example
- * ```tsx
- * import { useMpesaPayment, usePaymentStatus } from "@singularity-payments/react";
- *
- * function Payment() {
- *   const { initiatePayment, checkoutRequestId } = useMpesaPayment();
- *
- *   const { status, isPolling } = usePaymentStatus({
- *     checkoutRequestId,
- *     onSuccess: (status) => {
- *       console.log("Payment confirmed!", status.mpesaReceiptNumber);
- *     }
- *   });
- *
- *   return (
- *     <div>
- *       {isPolling && <p>Waiting for payment...</p>}
- *       {status && <p>Status: {status.resultDescription}</p>}
- *     </div>
- *   );
- * }
- * ```
- */
 export function usePaymentStatus(options: UsePaymentStatusOptions) {
   const config = useMpesaConfig();
   const [status, setStatus] = useState<PaymentStatus | null>(null);
@@ -72,9 +21,20 @@ export function usePaymentStatus(options: UsePaymentStatusOptions) {
 
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number>(0);
+  const pollCountRef = useRef<number>(0);
+  const maxPollsRef = useRef<number>(40);
 
   const enabled = options.enabled !== false;
+
+  const onSuccessRef = useRef(options.onSuccess);
+  const onFailureRef = useRef(options.onFailure);
+  const onTimeoutRef = useRef(options.onTimeout);
+
+  useEffect(() => {
+    onSuccessRef.current = options.onSuccess;
+    onFailureRef.current = options.onFailure;
+    onTimeoutRef.current = options.onTimeout;
+  }, [options.onSuccess, options.onFailure, options.onTimeout]);
 
   const stopPolling = useCallback(() => {
     if (pollIntervalRef.current) {
@@ -85,10 +45,20 @@ export function usePaymentStatus(options: UsePaymentStatusOptions) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    pollCountRef.current = 0;
   }, []);
 
   const checkStatus = useCallback(async () => {
-    if (!options.checkoutRequestId) return;
+    if (!options.CheckoutRequestID) return;
+
+    pollCountRef.current += 1;
+    if (pollCountRef.current > maxPollsRef.current) {
+      console.warn("Max polling attempts reached, stopping polls");
+      stopPolling();
+      setState("cancelled");
+      onTimeoutRef.current?.();
+      return;
+    }
 
     const endpoint = options.endpoint || `${config.baseUrl}/stk-query`;
     const fetcher = config.fetcher || fetch;
@@ -100,101 +70,83 @@ export function usePaymentStatus(options: UsePaymentStatusOptions) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          checkoutRequestID: options.checkoutRequestId,
+          CheckoutRequestID: options.CheckoutRequestID,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to check payment status");
+        console.error("Status check failed:", response.status);
+        return;
       }
 
       const data: PaymentStatus = await response.json();
+
       setStatus(data);
 
-      // Check if payment is complete
-      if (data.resultCode === "0") {
+      const ResultCode = data.ResultCode?.toString();
+
+      if (ResultCode === "0") {
         setState("success");
         stopPolling();
-        options.onSuccess?.(data);
-      } else if (data.resultCode && data.resultCode !== "0") {
+        onSuccessRef.current?.(data);
+      } else if (ResultCode && ResultCode !== "4999") {
         setState("failed");
         stopPolling();
-        options.onFailure?.(data);
+        onFailureRef.current?.(data);
       }
-      // If no resultCode yet, keep polling
     } catch (err) {
       const error = err instanceof Error ? err : new Error("Unknown error");
       setError(error);
+      console.error("Error checking status:", error);
     }
-  }, [options, config, stopPolling]);
+  }, [
+    options.CheckoutRequestID,
+    options.endpoint,
+    config.baseUrl,
+    config.fetcher,
+    stopPolling,
+  ]);
 
   useEffect(() => {
-    if (!options.checkoutRequestId || !enabled) {
+    if (!options.CheckoutRequestID || !enabled) {
       return;
     }
 
     setState("polling");
-    startTimeRef.current = Date.now();
+    pollCountRef.current = 0;
 
-    // Start polling
+    checkStatus();
+
     pollIntervalRef.current = setInterval(() => {
       checkStatus();
     }, config.pollInterval || 3000);
 
-    // Set timeout
     timeoutRef.current = setTimeout(() => {
       stopPolling();
       setState("cancelled");
-      options.onTimeout?.();
+      onTimeoutRef.current?.();
     }, config.pollTimeout || 120000);
-
-    // Initial check
-    checkStatus();
 
     return () => {
       stopPolling();
     };
-  }, [options.checkoutRequestId, enabled, checkStatus, stopPolling, config]);
+  }, [
+    options.CheckoutRequestID,
+    enabled,
+    checkStatus,
+    stopPolling,
+    config.pollInterval,
+    config.pollTimeout,
+  ]);
 
   return {
-    /**
-     * Current payment status
-     */
     status,
-
-    /**
-     * Current state
-     */
     state,
-
-    /**
-     * Whether currently polling for status
-     */
     isPolling: state === "polling",
-
-    /**
-     * Whether payment succeeded
-     */
     isSuccess: state === "success",
-
-    /**
-     * Whether payment failed
-     */
     isFailed: state === "failed",
-
-    /**
-     * Error if status check failed
-     */
     error,
-
-    /**
-     * Manually stop polling
-     */
     stopPolling,
-
-    /**
-     * Manually check status
-     */
     checkStatus,
   };
 }
