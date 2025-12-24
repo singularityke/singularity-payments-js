@@ -212,7 +212,7 @@ export class MpesaClient {
   async stkQuery(
     request: TransactionStatusRequest,
   ): Promise<TransactionStatusResponse> {
-    if (!request.checkoutRequestID) {
+    if (!request.CheckoutRequestID) {
       throw new MpesaValidationError("CheckoutRequestID is required");
     }
 
@@ -220,13 +220,13 @@ export class MpesaClient {
       BusinessShortCode: this.config.shortcode,
       Password: this.auth.getPassword(),
       Timestamp: this.auth.getTimestamp(),
-      CheckoutRequestID: request.checkoutRequestID,
+      CheckoutRequestID: request.CheckoutRequestID,
     };
 
     return this.makeRequest<TransactionStatusResponse>(
       "/mpesa/stkpushquery/v1/query",
       payload,
-      `query:${request.checkoutRequestID}`,
+      `query:${request.CheckoutRequestID}`,
     );
   }
 

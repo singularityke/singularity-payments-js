@@ -2,7 +2,7 @@ import { STKCallback, CallbackMetadata, C2BCallback } from "../types/mpesa";
 
 export interface ParsedCallbackData {
   merchantRequestId: string;
-  checkoutRequestId: string;
+  CheckoutRequestID: string;
   resultCode: number;
   resultDescription: string;
   amount?: number;
@@ -35,7 +35,7 @@ export interface CallbackHandlerOptions {
   onC2BValidation?: (data: ParsedC2BCallback) => Promise<boolean>;
   validateIp?: boolean;
   allowedIps?: string[];
-  isDuplicate?: (checkoutRequestId: string) => boolean | Promise<boolean>;
+  isDuplicate?: (CheckoutRequestID: string) => boolean | Promise<boolean>;
   logger?: {
     info: (message: string, data?: any) => void;
     error: (message: string, data?: any) => void;
@@ -90,7 +90,7 @@ export class MpesaCallbackHandler {
 
     const parsed: ParsedCallbackData = {
       merchantRequestId: stkCallback.MerchantRequestID,
-      checkoutRequestId: stkCallback.CheckoutRequestID,
+      CheckoutRequestID: stkCallback.CheckoutRequestID,
       resultCode: stkCallback.ResultCode,
       resultDescription: stkCallback.ResultDesc,
       isSuccess: stkCallback.ResultCode === 0,
@@ -226,16 +226,16 @@ export class MpesaCallbackHandler {
     const parsed = this.parseCallback(callback);
 
     this.log("info", "Processing STK callback", {
-      checkoutRequestId: parsed.checkoutRequestId,
+      CheckoutRequestID: parsed.CheckoutRequestID,
       resultCode: parsed.resultCode,
     });
 
     // Check for duplicates if handler provided
     if (this.options.isDuplicate) {
-      const isDupe = await this.options.isDuplicate(parsed.checkoutRequestId);
+      const isDupe = await this.options.isDuplicate(parsed.CheckoutRequestID);
       if (isDupe) {
         this.log("warn", "Duplicate callback detected", {
-          checkoutRequestId: parsed.checkoutRequestId,
+          CheckoutRequestID: parsed.CheckoutRequestID,
         });
         return; // Silently ignore duplicates
       }

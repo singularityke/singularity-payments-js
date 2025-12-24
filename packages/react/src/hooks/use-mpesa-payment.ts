@@ -70,7 +70,7 @@ export function useMpesaPayment(options: UseMpesaPaymentOptions = {}) {
   const [state, setState] = useState<PaymentState>("idle");
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<PaymentResponse | null>(null);
-  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(
+  const [CheckoutRequestID, setCheckoutRequestID] = useState<string | null>(
     null,
   );
 
@@ -78,7 +78,7 @@ export function useMpesaPayment(options: UseMpesaPaymentOptions = {}) {
     setState("idle");
     setError(null);
     setData(null);
-    setCheckoutRequestId(null);
+    setCheckoutRequestID(null);
   }, []);
 
   const initiatePayment = useCallback(
@@ -107,7 +107,7 @@ export function useMpesaPayment(options: UseMpesaPaymentOptions = {}) {
 
         const responseData: PaymentResponse = await response.json();
         setData(responseData);
-        setCheckoutRequestId(responseData.checkoutRequestId);
+        setCheckoutRequestID(responseData.CheckoutRequestID);
         setState("pending");
 
         options.onInitiated?.(responseData);
@@ -163,7 +163,7 @@ export function useMpesaPayment(options: UseMpesaPaymentOptions = {}) {
     /**
      * Checkout request ID for status polling
      */
-    checkoutRequestId,
+    CheckoutRequestID,
 
     /**
      * Reset the payment state

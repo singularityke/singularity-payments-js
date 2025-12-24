@@ -15,7 +15,7 @@ export interface STKPushResponse {
 }
 
 export interface TransactionStatusRequest {
-  checkoutRequestID: string;
+  CheckoutRequestID: string;
 }
 
 export interface TransactionStatusResponse {

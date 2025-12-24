@@ -1,7 +1,10 @@
-import { MpesaClient } from "@singularity-payments/core";
+import {
+  MpesaClient,
+  type STKCallback,
+  type C2BCallback,
+} from "@singularity-payments/core";
 import { NextRequest, NextResponse } from "next/server";
-import { MpesaRouteHandlers } from "./types";
-
+import type { MpesaRouteHandlers } from "./types";
 /**
  * Create Next.js route handlers for M-Pesa callbacks
  */
@@ -10,12 +13,11 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     stkCallback: {
       POST: async (request: NextRequest) => {
         try {
-          const body = await request.json();
+          const body = (await request.json()) as STKCallback;
           const ipAddress =
             request.headers.get("x-forwarded-for") ||
             request.headers.get("x-real-ip") ||
             undefined;
-
           const response = await client.handleSTKCallback(body, ipAddress);
           return NextResponse.json(response, { status: 200 });
         } catch (error: any) {
@@ -30,11 +32,10 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
         }
       },
     },
-
     c2bValidation: {
       POST: async (request: NextRequest) => {
         try {
-          const body = await request.json();
+          const body = (await request.json()) as C2BCallback;
           const response = await client.handleC2BValidation(body);
           return NextResponse.json(response, { status: 200 });
         } catch (error: any) {
@@ -49,11 +50,10 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
         }
       },
     },
-
     c2bConfirmation: {
       POST: async (request: NextRequest) => {
         try {
-          const body = await request.json();
+          const body = (await request.json()) as C2BCallback;
           const response = await client.handleC2BConfirmation(body);
           return NextResponse.json(response, { status: 200 });
         } catch (error: any) {
@@ -68,7 +68,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
         }
       },
     },
-
     /**
      * Catch-all handler for all M-Pesa webhooks
      * Routes based on URL path segment
@@ -81,21 +80,17 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
         const pathname = request.nextUrl.pathname;
         const segments = pathname.split("/").filter(Boolean);
         const lastSegment = segments[segments.length - 1];
-
         // Route to appropriate handler
         switch (lastSegment) {
           case "callback":
           case "stk-callback":
             return handlers.stkCallback.POST(request);
-
           case "validation":
           case "c2b-validation":
             return handlers.c2bValidation.POST(request);
-
           case "confirmation":
           case "c2b-confirmation":
             return handlers.c2bConfirmation.POST(request);
-
           default:
             return NextResponse.json(
               {
@@ -108,6 +103,5 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
       },
     },
   };
-
   return handlers;
 }

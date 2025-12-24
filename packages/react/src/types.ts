@@ -31,22 +31,18 @@ export interface PaymentRequest extends Omit<STKPushRequest, "callbackUrl"> {
 }
 
 export interface PaymentResponse {
-  merchantRequestId: string;
-  checkoutRequestId: string;
-  responseCode: string;
-  responseDescription: string;
+  MerchantRequestID: string;
+  CheckoutRequestID: string;
+  ResponseCode: string;
+  ResponseDescription: string;
   customerMessage: string;
 }
 
 export interface PaymentStatus {
-  checkoutRequestId: string;
+  CheckoutRequestID: string;
   merchantRequestId: string;
-  resultCode: string;
-  resultDescription: string;
-  amount?: number;
-  mpesaReceiptNumber?: string;
-  transactionDate?: string;
-  phoneNumber?: string;
+  ResultCode: string;
+  ResultDesc: string;
 }
 
 export type PaymentState =

@@ -1,5 +1,5 @@
-import {
-  MpesaClient,
+import { MpesaClient } from "@singularity-payments/core";
+import type {
   MpesaConfig,
   MpesaClientOptions,
 } from "@singularity-payments/core";
