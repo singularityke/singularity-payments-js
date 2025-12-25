@@ -1,0 +1,155 @@
+---
+title: Introduction
+description: A modern, type-safe M-Pesa SDK for seamless mobile payments integration
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { Cards, Card } from "fumadocs-ui/components/card";
+
+# Singularity Payments
+
+**A comprehensive, developer-friendly M-Pesa SDK that makes mobile payments integration effortless.**
+
+Singularity Payments is a modern TypeScript/JavaScript SDK built on top of [Safaricom's Daraja API](https://developer.safaricom.co.ke/) that simplifies M-Pesa integration for developers. Whether you're building an e-commerce platform, a SaaS application, or any service that requires mobile payments in Kenya, this SDK provides everything you need.
+
+## Why Singularity Payments?
+
+While the [Daraja API](https://developer.safaricom.co.ke/APIs) is powerful, integrating it directly comes with several challenges:
+
+## **Type Safety First**
+
+Built with TypeScript from the ground up, you get full IntelliSense support and catch errors before they reach production. No more guessing API parameters or dealing with cryptic runtime errors.
+
+```typescript
+//  Type-safe - your IDE will guide you
+const result = await client.stkPush({
+  amount: 1000,
+  phoneNumber: "254712345678",
+  accountReference: "ORDER-123",
+  transactionDesc: "Payment for order",
+});
+
+//  TypeScript catches mistakes instantly
+const result = await client.stkPush({
+  amount: "1000", // Error: amount must be a number
+  phone: "254712345678", // Error: unknown property 'phone'
+});
+```
+
+## **Simplified Authentication**
+
+No need to manually handle OAuth tokens, token refresh, or authentication flows. The SDK manages all of this automatically.
+
+```typescript
+// With Singularity Payments - authentication handled automatically
+const client = new MpesaClient({
+  consumerKey: process.env.MPESA_KEY,
+  consumerSecret: process.env.MPESA_SECRET,
+});
+
+await client.stkPush({
+  /* ... */
+}); // Just works!
+
+// Without SDK - manual token management required
+const token = await getOAuthToken();
+const headers = { Authorization: `Bearer ${token}` };
+// Handle token expiry, refresh logic, etc.
+```
+
+## **Intuitive API Design**
+
+Clean, modern API that follows JavaScript/TypeScript conventions. No need to study complex Daraja documentation for hours.
+
+<Cards>
+  <Card
+    title="STK Push"
+    description="Trigger payment prompts on customer phones"
+    href="/docs/api/stk-push"
+  />
+  <Card
+    title="Query Status"
+    description="Check transaction status in real-time"
+    href="/docs/api/query-status"
+  />
+
+</Cards>
+
+## **Built-in Error Handling**
+
+Comprehensive error handling with descriptive messages. Know exactly what went wrong and how to fix it.
+
+## **Framework Agnostic**
+
+Works seamlessly with any JavaScript framework or runtime:
+
+- Next.js
+- React
+
+<Callout type="info">
+  **Industry Standard**: Built following best practices from the [Daraja API
+  documentation](https://developer.safaricom.co.ke/Documentation) with
+  additional safeguards and optimizations.
+</Callout>
+
+## Comparison
+
+| Feature             | Singularity Payments     | Raw Daraja API             |
+| ------------------- | ------------------------ | -------------------------- |
+| TypeScript Support  | ✅ Full type safety      | ❌ Manual typing           |
+| Auto Authentication | ✅ Handled automatically | ❌ Manual token management |
+| Error Handling      | ✅ Descriptive errors    | ❌ Raw API errors          |
+| Documentation       | ✅ Comprehensive         | ⚠️ Basic                   |
+| Framework Support   | ✅ All frameworks        | ✅ All frameworks          |
+
+## What You Can Build
+
+With Singularity Payments, you can implement:
+
+- **E-commerce Checkouts** - Accept payments for online stores
+- **SaaS Subscriptions** - Process recurring subscription payments
+- **Ticket Sales** - Sell event tickets and generate payment confirmations
+- **Point of Sale** - Build POS systems for retail
+- **Peer-to-Peer Transfers** - Enable money transfers between users
+- **In-App Purchases** - Monetize mobile applications
+- **Bill Payments** - Process utility and service bill payments
+- **Payroll Systems** - Automate salary disbursements
+
+## Getting Started
+
+Ready to integrate M-Pesa payments? Get started in just 5 minutes:
+
+<Cards>
+  <Card
+    title="Installation"
+    description="Install the SDK and get your credentials"
+    href="/docs/getting-started/installation"
+  />
+  <Card
+    title="Quick Start"
+    description="Make your first payment in minutes"
+    href="/docs/getting-started/quick-start"
+  />
+
+</Cards>
+
+<Callout type="warn" title="Prerequisites">
+  Before you begin, you'll need: - A [Safaricom Daraja
+  account](https://developer.safaricom.co.ke/) - Your Consumer Key and Consumer
+  Secret - A registered M-Pesa shortcode (or use sandbox for testing)
+</Callout>
+
+## Community & Support
+
+- [GitHub Repository](https://github.com/singularityke/singularity-payments-js)
+- [Report Issues](https://github.com/singularityke/singularity-payments-js/issues)
+- [Discussions](https://github.com/singularityke/singularity-payments-js/discussions)
+- [Daraja API Docs](https://developer.safaricom.co.ke/Documentation)
+
+---
+
+<Callout>
+  **Ready to start?** Head over to the [Installation
+  Guide](/docs/getting-started/installation) to set up Singularity Payments in
+  your project.
+</Callout>

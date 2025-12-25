@@ -1,0 +1,327 @@
+---
+title: Quick Start
+description: Get started with M-Pesa payments in your Next.js app in minutes.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Callout } from "fumadocs-ui/components/callout";
+import { Steps, Step } from "fumadocs-ui/components/steps";
+
+# Quick Start
+
+Get M-Pesa payments working in your Next.js app in under 5 minutes.
+
+## Installation
+
+Install both the Next.js server package and React client package:
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+```bash
+npm install @singularity-payments/nextjs @singularity-payments/react
+```
+
+  </Tab>
+  <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/nextjs @singularity-payments/react
+```
+
+  </Tab>
+  <Tab value="yarn">
+```bash
+yarn add @singularity-payments/nextjs @singularity-payments/react
+```
+
+  </Tab>
+  <Tab value="bun">
+```bash
+bun add @singularity-payments/nextjs @singularity-payments/react
+```
+
+  </Tab>
+</Tabs>
+## Setup Ngrok for Testing
+
+M-Pesa requires a public callback URL to send payment notifications. For local development, use ngrok:
+
+<Steps>
+<Step>
+
+Install ngrok from [ngrok.com](https://ngrok.com)
+
+</Step>
+<Step>
+
+Start ngrok on your dev port:
+
+```bash
+ngrok http 3000
+```
+
+</Step>
+<Step>
+
+Copy the forwarding URL (e.g., `https://abc123.ngrok-free.app`)
+
+</Step>
+</Steps>
+
+<Callout type="warn">
+  Keep ngrok running while testing. M-Pesa callbacks will fail without it.
+</Callout>
+
+## Environment Setup
+
+Create a `.env.local` file in your project root:
+
+```bash title=".env.local"
+MPESA_CONSUMER_KEY=your_consumer_key
+MPESA_CONSUMER_SECRET=your_consumer_secret
+MPESA_SHORTCODE=your_shortcode
+MPESA_PASSKEY=your_passkey
+MPESA_ENVIRONMENT=sandbox
+NEXT_PUBLIC_APP_URL=https://your-ngrok-url.ngrok-free.app
+```
+
+<Callout type="warn">
+  Never commit your .env file to version control. Add it to .gitignore.
+</Callout>
+
+## Configure M-Pesa Client
+
+Create a server configuration file:
+
+```typescript title="lib/mpesa.ts"
+import { createMpesa } from "@singularity-payments/nextjs";
+
+export const mpesa = createMpesa(
+  {
+    consumerKey: process.env.MPESA_CONSUMER_KEY!,
+    consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
+    passkey: process.env.MPESA_PASSKEY!,
+    shortcode: process.env.MPESA_SHORTCODE!,
+    environment:
+      (process.env.MPESA_ENVIRONMENT as "sandbox" | "production") || "sandbox",
+    callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/mpesa/callback`,
+  },
+  {
+    callbackOptions: {
+      onSuccess: async (data) => {
+        console.log("Payment successful:", data);
+      },
+      onFailure: async (data) => {
+        console.log("Payment failed:", data);
+      },
+    },
+  },
+);
+```
+
+## Create API Route
+
+Create a catch-all API route to handle all M-Pesa operations:
+
+```typescript title="app/api/mpesa/[...mpesa]/route.ts"
+import { mpesa } from "~/lib/mpesa";
+
+export const { POST } = mpesa.handlers.catchAll;
+```
+
+This single route handles all M-Pesa operations including callbacks, payment initiation, and status queries.
+
+## Create Payment Form
+
+Create a client component for handling payments:
+
+```tsx title="components/payment-form.tsx"
+"use client";
+
+import { useState } from "react";
+import { useMpesaPayment, usePaymentStatus } from "@singularity-payments/react";
+
+export function PaymentForm() {
+  const [amount, setAmount] = useState("100");
+  const [phoneNumber, setPhoneNumber] = useState("254712345678");
+
+  const { initiatePayment, state, CheckoutRequestID, error, reset } =
+    useMpesaPayment();
+  const { status, isSuccess, isFailed } = usePaymentStatus({
+    CheckoutRequestID,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await initiatePayment({
+      amount: Number(amount),
+      phoneNumber,
+      accountReference: "ORDER001",
+      transactionDesc: "Payment",
+    });
+  };
+
+  if (isSuccess) {
+    return (
+      <div className="mx-auto max-w-md rounded-lg border border-green-600 bg-green-50 p-6 dark:border-green-400 dark:bg-green-950">
+        <h3 className="mb-2 text-lg font-semibold text-green-900 dark:text-green-100">
+          Payment Successful
+        </h3>
+        <p className="mb-4 text-sm text-green-800 dark:text-green-200">
+          {status?.ResultDesc}
+        </p>
+        <button
+          onClick={reset}
+          className="w-full rounded-md border border-green-600 bg-transparent px-4 py-2 text-green-900 hover:bg-green-100 dark:border-green-400 dark:text-green-100 dark:hover:bg-green-900"
+        >
+          Make Another Payment
+        </button>
+      </div>
+    );
+  }
+
+  if (isFailed && status) {
+    return (
+      <div className="mx-auto max-w-md rounded-lg border border-red-600 bg-red-50 p-6 dark:border-red-400 dark:bg-red-950">
+        <h3 className="mb-2 text-lg font-semibold text-red-900 dark:text-red-100">
+          Payment Failed
+        </h3>
+        <p className="mb-4 text-sm text-red-800 dark:text-red-200">
+          {status.ResultDesc}
+        </p>
+        <button
+          onClick={reset}
+          className="w-full rounded-md border border-red-600 bg-transparent px-4 py-2 text-red-900 hover:bg-red-100 dark:border-red-400 dark:text-red-100 dark:hover:bg-red-900"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-md rounded-lg border p-6">
+      <h2 className="mb-6 text-2xl font-bold">M-Pesa Payment</h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="mb-2 block text-sm font-medium">Amount (KES)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            min="1"
+            required
+            disabled={state !== "idle"}
+            className="w-full rounded-md border px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium">Phone Number</label>
+          <input
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="254712345678"
+            required
+            disabled={state !== "idle"}
+            className="w-full rounded-md border px-3 py-2"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={state !== "idle"}
+          className="w-full rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {state === "initiating" && "Processing..."}
+          {state === "pending" && "Check Your Phone"}
+          {state === "idle" && "Pay with M-Pesa"}
+        </button>
+      </form>
+
+      {error && (
+        <div className="mt-4 rounded-md border border-red-600 bg-red-50 p-3 dark:border-red-400 dark:bg-red-950">
+          <p className="text-sm text-red-800 dark:text-red-200">
+            {error.message}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## Use in Your Page
+
+Import and use the payment form in any page:
+
+```tsx title="app/page.tsx"
+import { PaymentForm } from "~/components/payment-form";
+
+export default function Home() {
+  return (
+    <main className="flex min-h-screen items-center justify-center">
+      <PaymentForm />
+    </main>
+  );
+}
+```
+
+## Test Your Integration
+
+<Steps>
+<Step>
+
+Start your development server
+
+```bash
+npm run dev
+```
+
+</Step>
+<Step>
+
+Start ngrok in another terminal
+
+```bash
+ngrok http 3000
+```
+
+</Step>
+<Step>
+
+Update your `.env.local` with the ngrok URL and restart your dev server
+
+</Step>
+<Step>
+
+Navigate to your page with the payment form
+
+</Step>
+<Step>
+
+Enter a test amount and phone number
+
+</Step>
+<Step>
+
+Click Pay with M-Pesa and check your phone for the STK Push prompt
+
+</Step>
+<Step>
+
+Enter your M-Pesa PIN to complete the payment
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  In sandbox mode, use the test credentials provided by Safaricom Daraja.
+</Callout>
+
+## What's Next
+
+- Learn about [Configuration Options](/docs/getting-started/configuration)
+- Explore [API Reference](/docs/api-reference/mpesa-client)
+- Set up [Database Integration](/docs/guides/database-integration)
