@@ -86,13 +86,14 @@ export function PaymentForm() {
 
         <button
           type="submit"
-          disabled={state !== "idle"}
+          disabled={state !== "idle" || isSuccess || isFailed}
           className="w-full rounded-md bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           {state === "initiating" && "Initiating Payment..."}
           {state === "pending" && "Check Your Phone..."}
           {isPolling && "Processing Payment..."}
-          {state === "idle" && "Pay with M-Pesa"}
+          {(isSuccess || isFailed) && "Payment Complete"}
+          {state === "idle" && !isSuccess && !isFailed && "Pay with M-Pesa"}
         </button>
       </form>
 

@@ -1,0 +1,134 @@
+---
+title: Installation
+description: Learn how to install the M-Pesa SDK for JavaScript.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Callout } from "fumadocs-ui/components/callout";
+import { Cards, Card } from "fumadocs-ui/components/card";
+
+# Installation
+
+Get started with Singularity Payments by installing the appropriate package for your project.
+
+## Prerequisites
+
+Before installing, make sure you have:
+
+- Node.js 18+ installed
+- A [Safaricom Daraja account](https://developer.safaricom.co.ke/)
+- Your M-Pesa API credentials (Consumer Key and Secret), if you don't know how to get them you can follow this guide [here](https://developer.safaricom.co.ke/docs/getting-started)
+
+## Choose Your Package
+
+<Cards>
+  <Card
+    title="Server-Side"
+    description="For Next.js, SvelteKit, Node.js backends"
+    href="#server-side"
+  />
+  <Card
+    title="Client-Side"
+    description="For React and Svelte applications"
+    href="#client-side"
+  />
+</Cards>
+
+## Server-Side
+
+### Next JS
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+```bash
+npm install @singularity-payments/nextjs
+```
+
+  </Tab>
+  <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/nextjs 
+```
+
+  </Tab>
+  <Tab value="yarn">
+```bash
+yarn add @singularity-payments/nextjs 
+```
+
+  </Tab>
+  <Tab value="bun">
+```bash
+bun add @singularity-payments/nextjs 
+```
+
+  </Tab>
+</Tabs>
+
+## Client-Side
+
+<Callout type="warn" title="Security Warning">
+  Client-side packages require a backend server. Never expose M-Pesa credentials
+  in client-side code, these packages are designed to simplify integration with
+  the backend
+</Callout>
+
+### React
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+```bash
+npm install @singularity-payments/react
+```
+
+  </Tab>
+  <Tab value="pnpm">
+```bash
+pnpm add @singularity/payments-react
+```
+
+  </Tab>
+  <Tab value="yarn">
+```bash
+yarn add @singularity/payments-react
+```
+
+  </Tab>
+  <Tab value="bun">
+```bash
+bun add @singularity/payments-react
+```
+
+  </Tab>
+</Tabs>
+
+## Environment Variables
+
+After installation, set up your environment variables:
+
+```bash title=".env.local"
+MPESA_CONSUMER_KEY=your_consumer_key
+MPESA_CONSUMER_SECRET=your_consumer_secret
+MPESA_SHORTCODE=your_shortcode
+MPESA_PASSKEY=your_passkey
+MPESA_ENVIRONMENT=sandbox # or 'production'
+```
+
+<Callout type="warn">
+  Never commit your .env file to version control. Add it to .gitignore.
+</Callout>
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Quick Start"
+    description="Make your first payment in minutes"
+    href="/docs/getting-started/quick-start"
+  />
+  <Card
+    title="Configuration"
+    description="Learn about all configuration options"
+    href="/docs/getting-started/configuration"
+  />
+</Cards>
