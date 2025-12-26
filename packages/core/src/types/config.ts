@@ -9,6 +9,8 @@ export interface MpesaConfig {
   callbackUrl?: string;
   timeoutUrl?: string;
   resultUrl?: string;
+  initiatorName?: string;
+  securityCredential?: string;
 }
 
 export interface MpesaPlugin {
