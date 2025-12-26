@@ -8,5 +8,7 @@ export interface MpesaRouteHandlers {
   stkCallback: RouteHandler;
   c2bValidation: RouteHandler;
   c2bConfirmation: RouteHandler;
+  b2cResult: RouteHandler;
+  b2cTimeout: RouteHandler;
   catchAll: RouteHandler;
 }
