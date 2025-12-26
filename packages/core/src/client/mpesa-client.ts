@@ -15,6 +15,18 @@ import {
   C2BRegisterResponse,
   STKCallback,
   C2BCallback,
+  B2CRequest,
+  B2CResponse,
+  B2BRequest,
+  B2BResponse,
+  AccountBalanceRequest,
+  AccountBalanceResponse,
+  GeneralTransactionStatusRequest,
+  GeneralTransactionStatusResponse,
+  ReversalRequest,
+  ReversalResponse,
+  DynamicQRRequest,
+  DynamicQRResponse,
 } from "../types/mpesa";
 import {
   MpesaValidationError,
@@ -300,6 +312,186 @@ export class MpesaClient {
         "Validation failed",
       );
     }
+  }
+  /**
+   * B2C - Send money from business to customer
+   */
+  async b2c(request: B2CRequest): Promise<B2CResponse> {
+    if (request.amount < 10) {
+      throw new MpesaValidationError("B2C amount must be greater than 10");
+    }
+    if (!request.remarks || request.remarks.length > 100) {
+      throw new MpesaValidationError(
+        "B2C remarks must be between 1 and 100 characters",
+      );
+    }
+    const phone = this.validateAndFormatPhone(request.phoneNumber);
+    const payload = {
+      InitiatorName: this.config.initiatorName,
+      SecurityCredential: this.config.securityCredential,
+      CommandID: request.commandID,
+      Amount: Math.floor(request.amount),
+      PartyA: this.config.shortcode,
+      PartyB: phone,
+      Remarks: request.remarks,
+      QueueTimeOutURL: request.timeoutUrl || this.config.timeoutUrl,
+      ResultURL: request.resultUrl || this.config.resultUrl,
+      Occasion: request.occasion || "",
+    };
+    return this.makeRequest<B2CResponse>(
+      "/mpesa/b2c/v1/paymentrequest",
+      payload,
+      `b2c:${phone}`,
+    );
+  }
+  /**
+   * B2B - Send money from business to business
+   */
+  async b2b(request: B2BRequest): Promise<B2BResponse> {
+    if (request.amount < 1) {
+      throw new MpesaValidationError("B2B amount must be greater than 0");
+    }
+    if (!request.remarks || request.remarks.length > 100) {
+      throw new MpesaValidationError(
+        "B2B remarks must be between 1 and 100 characters",
+      );
+    }
+    if (!request.accountReference || request.accountReference.length > 13) {
+      throw new MpesaValidationError(
+        "Account reference is required and must be 13 characters or less",
+      );
+    }
+    const payload = {
+      InitiatorName: this.config.initiatorName,
+      SecurityCredential: this.config.securityCredential,
+      CommandID: request.commandID,
+      Amount: Math.floor(request.amount),
+      PartyA: this.config.shortcode,
+      PartyB: request.partyB,
+      SenderIdentifierType: request.senderIdentifierType,
+      RecieverIdentifierType: request.receiverIdentifierType,
+      Remarks: request.remarks,
+      AccountReference: request.accountReference,
+      QueueTimeOutURL: request.timeoutUrl || this.config.timeoutUrl,
+      ResultURL: request.resultUrl || this.config.resultUrl,
+    };
+    return this.makeRequest<B2BResponse>(
+      "/mpesa/b2b/v1/paymentrequest",
+      payload,
+      `b2b:${request.partyB}`,
+    );
+  }
+  /**
+   * Query account balance
+   */
+  async accountBalance(
+    request: AccountBalanceRequest = {},
+  ): Promise<AccountBalanceResponse> {
+    const payload = {
+      Initiator: this.config.initiatorName,
+      SecurityCredential: this.config.securityCredential,
+      CommandID: "AccountBalance",
+      PartyA: request.partyA || this.config.shortcode,
+      IdentifierType: request.identifierType || "4",
+      Remarks: request.remarks || "Account balance query",
+      QueueTimeOutURL: request.timeoutUrl || this.config.timeoutUrl,
+      ResultURL: request.resultUrl || this.config.resultUrl,
+    };
+    return this.makeRequest<AccountBalanceResponse>(
+      "/mpesa/accountbalance/v1/query",
+      payload,
+      "balance",
+    );
+  }
+  /**
+   * Query general transaction status
+   */
+  async transactionStatus(
+    request: GeneralTransactionStatusRequest,
+  ): Promise<GeneralTransactionStatusResponse> {
+    if (!request.transactionID) {
+      throw new MpesaValidationError("Transaction ID is required");
+    }
+    const payload = {
+      Initiator: this.config.initiatorName,
+      SecurityCredential: this.config.securityCredential,
+      CommandID: "TransactionStatusQuery",
+      TransactionID: request.transactionID,
+      PartyA: request.partyA || this.config.shortcode,
+      IdentifierType: request.identifierType || "4",
+      Remarks: request.remarks || "Transaction status query",
+      Occasion: request.occasion || "",
+      QueueTimeOutURL: request.timeoutUrl || this.config.timeoutUrl,
+      ResultURL: request.resultUrl || this.config.resultUrl,
+    };
+    return this.makeRequest<GeneralTransactionStatusResponse>(
+      "/mpesa/transactionstatus/v1/query",
+      payload,
+      `status:${request.transactionID}`,
+    );
+  }
+  /**
+   * Reverse a transaction
+   */
+
+  async reversal(request: ReversalRequest): Promise<ReversalResponse> {
+    if (!request.transactionID) {
+      throw new MpesaValidationError("Transaction ID is required");
+    }
+    if (request.amount < 1) {
+      throw new MpesaValidationError("Amount must be greater than 0");
+    }
+    const payload = {
+      Initiator: this.config.initiatorName,
+      SecurityCredential: this.config.securityCredential,
+      CommandID: "TransactionReversal",
+      TransactionID: request.transactionID,
+      Amount: Math.floor(request.amount),
+      ReceiverParty: request.receiverParty || this.config.shortcode,
+      RecieverIdentifierType: request.receiverIdentifierType || "11",
+      Remarks: request.remarks || "Transaction reversal",
+      Occasion: request.occasion || "",
+      QueueTimeOutURL: request.timeoutUrl || this.config.timeoutUrl,
+      ResultURL: request.resultUrl || this.config.resultUrl,
+    };
+    return this.makeRequest<ReversalResponse>(
+      "/mpesa/reversal/v1/request",
+      payload,
+      `reversal:${request.transactionID}`,
+    );
+  }
+  /**
+   * Generate Dynamic QR code
+   */
+  async generateDynamicQR(
+    request: DynamicQRRequest,
+  ): Promise<DynamicQRResponse> {
+    if (!request.merchantName || request.merchantName.length > 26) {
+      throw new MpesaValidationError(
+        "Merchent name is required and must be 26 characters or less",
+      );
+    }
+    if (!request.refNo || request.refNo.length > 12) {
+      throw new MpesaValidationError(
+        "Reference number is required and must be 12 characters or less",
+      );
+    }
+    if (request.amount < 1 || request.amount > 999999) {
+      throw new MpesaValidationError("Amount must be between 1 and 999999 KES");
+    }
+    const payload = {
+      MerchantName: request.merchantName,
+      RefNo: request.refNo,
+      Amount: Math.floor(request.amount),
+      TrxCode: request.transactionType,
+      CPI: request.creditPartyIdentifier,
+      Size: request.size || "300",
+    };
+    return this.makeRequest<DynamicQRResponse>(
+      "/mpesa/qrcode/v1/generate",
+      payload,
+      `qr:${request.refNo}`,
+    );
   }
 
   /**
