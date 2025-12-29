@@ -15,56 +15,182 @@ Get started with Singularity Payments by installing the appropriate package for 
 
 Before installing, make sure you have:
 
-- Node.js 18+ installed
-- A [Safaricom Daraja account](https://developer.safaricom.co.ke/)
-- Your M-Pesa API credentials (Consumer Key and Secret), if you don't know how to get them you can follow this guide [here](https://developer.safaricom.co.ke/docs/getting-started)
+- Node.js installed
+- A node package manager (npm, pnpm, yarn, bun)
 
 ## Choose Your Package
 
 <Cards>
   <Card
     title="Server-Side"
-    description="For Next.js, SvelteKit, Node.js backends"
+    description="For Next.js, SvelteKit, Express.js, Nuxt.js, Elysia, Fastify, Hono backends"
     href="#server-side"
   />
   <Card
     title="Client-Side"
-    description="For React and Svelte applications"
+    description="For React, Vue.js, Svelte applications"
     href="#client-side"
   />
 </Cards>
 
 ## Server-Side
 
-### Next JS
-
-<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
+<Tabs items={["Next.js", "SvelteKit", "Nuxt", "Elysia", "Fastify", "Hono"]}>
+  <Tab value="Next.js">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
 ```bash
 npm install @singularity-payments/nextjs
 ```
-
-  </Tab>
-  <Tab value="pnpm">
+      </Tab>
+      <Tab value="pnpm">
 ```bash
-pnpm add @singularity-payments/nextjs 
+pnpm add @singularity-payments/nextjs
 ```
-
-  </Tab>
-  <Tab value="yarn">
+      </Tab>
+      <Tab value="yarn">
 ```bash
-yarn add @singularity-payments/nextjs 
+yarn add @singularity-payments/nextjs
 ```
-
-  </Tab>
-  <Tab value="bun">
+      </Tab>
+      <Tab value="bun">
 ```bash
-bun add @singularity-payments/nextjs 
+bun add @singularity-payments/nextjs
 ```
+      </Tab>
+    </Tabs>
+  </Tab>
+<Tab value="SvelteKit">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/sveltekit
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/sveltekit
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/sveltekit
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/sveltekit
+```
+    </Tab>
+  </Tabs>
+</Tab>
+<Tab value="Nuxt">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/nuxt
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/nuxt
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/nuxt
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/nuxt
+```
+    </Tab>
+  </Tabs>
+</Tab>
+<Tab value="Elysia">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/elysia
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/elysia
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/elysia
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/elysia
+```
+    </Tab>
+  </Tabs>
+</Tab>
+<Tab value="Fastify">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/fastify
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/fastify
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/fastify
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/fastify
+```
+    </Tab>
+  </Tabs>
+</Tab>
 
+<Tab value="Fastify">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">```bash npm install @singularity-payments/fastify ```</Tab>
+    <Tab value="pnpm">```bash pnpm add @singularity-payments/fastify ```</Tab>
+    <Tab value="yarn">```bash yarn add @singularity-payments/fastify ```</Tab>
+    <Tab value="bun">```bash bun add @singularity-payments/fastify ```</Tab>
+  </Tabs>
+</Tab>
+
+  <Tab value="Hono">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+```bash
+npm install @singularity-payments/hono
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/hono
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @singularity-payments/hono
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @singularity-payments/hono
+```
+      </Tab>
+    </Tabs>
   </Tab>
 </Tabs>
-
 ## Client-Side
 
 <Callout type="warn" title="Security Warning">
@@ -73,32 +199,79 @@ bun add @singularity-payments/nextjs
   the backend
 </Callout>
 
-### React
-
-<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
+<Tabs items={["React", "Vue", "Svelte"]}>
+  <Tab value="React">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
 ```bash
 npm install @singularity-payments/react
 ```
-
-  </Tab>
-  <Tab value="pnpm">
+      </Tab>
+      <Tab value="pnpm">
 ```bash
-pnpm add @singularity/payments-react
+pnpm add @singularity-payments/react
 ```
-
-  </Tab>
-  <Tab value="yarn">
+      </Tab>
+      <Tab value="yarn">
 ```bash
-yarn add @singularity/payments-react
+yarn add @singularity-payments/react
 ```
-
-  </Tab>
-  <Tab value="bun">
+      </Tab>
+      <Tab value="bun">
 ```bash
-bun add @singularity/payments-react
+bun add @singularity-payments/react
 ```
+      </Tab>
+    </Tabs>
+  </Tab>
+<Tab value="Vue">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/vue
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/vue
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/vue
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/vue
+```
+    </Tab>
+  </Tabs>
+</Tab>
 
+  <Tab value="Svelte">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+```bash
+npm install @singularity-payments/svelte
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/svelte
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @singularity-payments/svelte
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @singularity-payments/svelte
+```
+      </Tab>
+    </Tabs>
   </Tab>
 </Tabs>
 
