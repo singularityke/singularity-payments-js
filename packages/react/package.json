@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "React hooks and components for M-Pesa payments",
+  "description": "React client for M-Pesa payments",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -20,20 +20,16 @@
     "dist"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsup src/index.ts --format cjs,esm --dts --external react --external react-dom",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --external react --external react-dom --watch"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
   },
   "keywords": [
     "mpesa",
     "react",
     "payments",
-    "kenya",
-    "hooks"
+    "kenya"
   ],
-  "author": "",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.25.0",
   "peerDependencies": {
     "react": ">=18.0.0"
   },
@@ -41,10 +37,10 @@
     "@singularity-payments/core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^18.3.12",
-    "react": "^18.3.1",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2"
+    "@types/node": "^25.0.3",
+    "@types/react": "^18.3.0",
+    "react": "^18.3.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   }
 }

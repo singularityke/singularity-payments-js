@@ -1,0 +1,49 @@
+{
+  "name": "@singularity-payments/sveltekit",
+  "version": "0.1.0-alpha.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "SvelteKit integration for M-Pesa payments",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup src/index.ts --format cjs,esm --dts --external next",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --external next --watch"
+  },
+  "keywords": [
+    "mpesa",
+    "sveltekit",
+    "payments",
+    "kenya"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.25.0",
+  "peerDependencies": {
+    "next": ">=13.0.0"
+  },
+  "dependencies": {
+    "@singularity-payments/core": "workspace:*",
+    "@sveltejs/kit": "^2.49.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "next": "^15.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

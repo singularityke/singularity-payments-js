@@ -425,6 +425,15 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
               resultUrl,
               timeoutUrl,
             } = body;
+            console.log("B2B Request Parameters:", {
+              amount,
+              partyB,
+              commandID,
+              senderIdentifierType,
+              receiverIdentifierType,
+              accountReference,
+              remarks,
+            });
 
             if (!amount || !partyB || !commandID || !accountReference) {
               return NextResponse.json(
@@ -447,6 +456,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
               resultUrl,
               timeoutUrl,
             });
+            console.log("B2B Response:", response);
 
             return NextResponse.json(response);
           }
@@ -566,14 +576,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
               creditPartyIdentifier,
               size,
             } = body;
-            if (size != "500" && size != "300") {
-              return NextResponse.json(
-                {
-                  error: "Size must be either 500 or 300",
-                },
-                { status: 400 },
-              );
-            }
+
+            // Check required fields
             if (
               !merchantName ||
               !refNo ||
@@ -585,9 +589,24 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
                 {
                   error:
                     "Merchant name, reference number, amount, transaction type, and credit party identifier are required",
+                  received: body,
                 },
                 { status: 400 },
               );
+            }
+
+            // Make sure the size is the valid ones
+            let qrSize: "300" | "500" | undefined = undefined;
+            if (size) {
+              if (size !== "500" && size !== "300") {
+                return NextResponse.json(
+                  {
+                    error: "Size must be either '300' or '500'",
+                  },
+                  { status: 400 },
+                );
+              }
+              qrSize = size;
             }
 
             const response = await client.generateDynamicQR({
@@ -596,13 +615,12 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
               amount: Number(amount),
               transactionType: transactionType as any,
               creditPartyIdentifier,
-              size,
+              size: qrSize,
             });
 
             return NextResponse.json(response);
           }
 
-          // Unknown endpoint
           return NextResponse.json(
             {
               ResultCode: 1,
