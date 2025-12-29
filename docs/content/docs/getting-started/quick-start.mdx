@@ -1,46 +1,258 @@
 ---
 title: Quick Start
-description: Get started with M-Pesa payments in your Next.js app in minutes.
+description: Get started with M-Pesa payments in your app in minutes.
 ---
 
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { Callout } from "fumadocs-ui/components/callout";
 import { Steps, Step } from "fumadocs-ui/components/steps";
 
-# Quick Start
-
-Get M-Pesa payments working in your Next.js app in under 5 minutes.
-
 ## Installation
 
-Install both the Next.js server package and React client package:
+Install both the Client and Server package client package
 
-<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
+## Server-Side
+
+<Tabs items={["Next.js", "SvelteKit", "Nuxt", "Elysia", "Fastify", "Hono"]}>
+  <Tab value="Next.js">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
 ```bash
-npm install @singularity-payments/nextjs @singularity-payments/react
+npm install @singularity-payments/nextjs
 ```
-
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/nextjs
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @singularity-payments/nextjs
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @singularity-payments/nextjs
+```
+      </Tab>
+    </Tabs>
   </Tab>
-  <Tab value="pnpm">
+<Tab value="SvelteKit">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
 ```bash
-pnpm add @singularity-payments/nextjs @singularity-payments/react
+npm install @singularity-payments/sveltekit
 ```
-
-  </Tab>
-  <Tab value="yarn">
+    </Tab>
+    <Tab value="pnpm">
 ```bash
-yarn add @singularity-payments/nextjs @singularity-payments/react
+pnpm add @singularity-payments/sveltekit
 ```
-
-  </Tab>
-  <Tab value="bun">
+    </Tab>
+    <Tab value="yarn">
 ```bash
-bun add @singularity-payments/nextjs @singularity-payments/react
+yarn add @singularity-payments/sveltekit
 ```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/sveltekit
+```
+    </Tab>
+  </Tabs>
+</Tab>
+<Tab value="Nuxt">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/nuxt
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/nuxt
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/nuxt
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/nuxt
+```
+    </Tab>
+  </Tabs>
+</Tab>
+<Tab value="Elysia">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/elysia
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/elysia
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/elysia
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/elysia
+```
+    </Tab>
+  </Tabs>
+</Tab>
+<Tab value="Fastify">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/fastify
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/fastify
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/fastify
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/fastify
+```
+    </Tab>
+  </Tabs>
+</Tab>
 
+<Tab value="Fastify">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">```bash npm install @singularity-payments/fastify ```</Tab>
+    <Tab value="pnpm">```bash pnpm add @singularity-payments/fastify ```</Tab>
+    <Tab value="yarn">```bash yarn add @singularity-payments/fastify ```</Tab>
+    <Tab value="bun">```bash bun add @singularity-payments/fastify ```</Tab>
+  </Tabs>
+</Tab>
+
+  <Tab value="Hono">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+```bash
+npm install @singularity-payments/hono
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/hono
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @singularity-payments/hono
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @singularity-payments/hono
+```
+      </Tab>
+    </Tabs>
   </Tab>
 </Tabs>
+## Client-Side
+
+<Callout type="warn" title="Security Warning">
+  Client-side packages require a backend server. Never expose M-Pesa credentials
+  in client-side code, these packages are designed to simplify integration with
+  the backend
+</Callout>
+
+<Tabs items={["React", "Vue", "Svelte"]}>
+  <Tab value="React">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+```bash
+npm install @singularity-payments/react
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/react
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @singularity-payments/react
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @singularity-payments/react
+```
+      </Tab>
+    </Tabs>
+  </Tab>
+<Tab value="Vue">
+  <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+    <Tab value="npm">
+```bash
+npm install @singularity-payments/vue
+```
+    </Tab>
+    <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/vue
+```
+    </Tab>
+    <Tab value="yarn">
+```bash
+yarn add @singularity-payments/vue
+```
+    </Tab>
+    <Tab value="bun">
+```bash
+bun add @singularity-payments/vue
+```
+    </Tab>
+  </Tabs>
+</Tab>
+
+  <Tab value="Svelte">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+```bash
+npm install @singularity-payments/svelte
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/svelte
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @singularity-payments/svelte
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @singularity-payments/svelte
+```
+      </Tab>
+    </Tabs>
+  </Tab>
+</Tabs>
+
 ## Setup Ngrok for Testing
 
 M-Pesa requires a public callback URL to send payment notifications. For local development, use ngrok:
@@ -49,6 +261,38 @@ M-Pesa requires a public callback URL to send payment notifications. For local d
 <Step>
 
 Install ngrok from [ngrok.com](https://ngrok.com)
+or using a node package manager:
+
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+
+```bash
+npm install -g ngrok
+```
+
+      </Tab>
+      <Tab value="pnpm">
+
+```bash
+pnpm add -g ngrok
+```
+
+      </Tab>
+      <Tab value="yarn">
+
+```bash
+yarn global add ngrok
+```
+
+      </Tab>
+      <Tab value="bun">
+
+```bash
+bun add -g ngrok
+```
+
+      </Tab>
+    </Tabs>
 
 </Step>
 <Step>
@@ -92,7 +336,9 @@ NEXT_PUBLIC_APP_URL=https://your-ngrok-url.ngrok-free.app
 
 Create a server configuration file:
 
-```typescript title="lib/mpesa.ts"
+<Tabs items={["Next.js", "SvelteKit", "Nuxt", "Elysia", "Express", "Fastify", "Hono"]}>
+  <Tab value="Next.js">
+```typescript
 import { createMpesa } from "@singularity-payments/nextjs";
 
 export const mpesa = createMpesa(
@@ -117,10 +363,277 @@ export const mpesa = createMpesa(
   },
 );
 ```
+  </Tab>
 
-## Create API Route
+  <Tab value="SvelteKit">
+```typescript
+import { createMpesa } from '@singularity-payments/sveltekit';
+import {
+  MPESA_CONSUMER_KEY,
+  MPESA_CONSUMER_SECRET,
+  MPESA_PASSKEY,
+  MPESA_SHORTCODE
+} from '$env/static/private';
 
-Create a catch-all API route to handle all M-Pesa operations:
+export const mpesa = createMpesa(
+  {
+    consumerKey: MPESA_CONSUMER_KEY,
+    consumerSecret: MPESA_CONSUMER_SECRET,
+    passkey: MPESA_PASSKEY,
+    shortcode: MPESA_SHORTCODE,
+    environment: 'sandbox',
+    callbackUrl: `https://your-domain.ngrok-free.dev/api/mpesa/callback`
+  },
+  {
+    callbackOptions: {
+      onSuccess: async (data) => {
+        console.log('Payment successful:', data);
+      },
+      onFailure: async (data) => {
+        console.log('Payment failed:', data);
+      }
+    }
+  }
+);
+```
+  </Tab>
+
+  <Tab value="Nuxt">
+```typescript
+import { createMpesa } from "@singularity-payments/nuxt";
+
+const config = useRuntimeConfig();
+
+export const mpesa = createMpesa(
+  {
+    consumerKey: config.mpesaConsumerKey,
+    consumerSecret: config.mpesaConsumerSecret,
+    passkey: config.mpesaPasskey,
+    shortcode: config.mpesaShortcode,
+    environment: "sandbox",
+    callbackUrl: `https://your-domain.ngrok-free.dev/api/mpesa/callback`,
+  },
+  {
+    callbackOptions: {
+      onSuccess: async (data) => {
+        console.log("Payment successful:", data);
+      },
+      onFailure: async (data) => {
+        console.log("Payment failed:", data);
+      },
+    },
+  },
+);
+```
+  </Tab>
+
+  <Tab value="Elysia">
+```typescript
+import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
+import { createMpesa } from "@singularity-payments/elysia";
+
+const mpesa = createMpesa({
+consumerKey: process.env.MPESA_CONSUMER_KEY!,
+consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
+passkey: process.env.MPESA_PASSKEY!,
+shortcode: process.env.MPESA_SHORTCODE!,
+environment: "sandbox",
+callbackUrl: `https://your-domain.ngrok-free.dev/api/mpesa/callback`,
+});
+
+const app = new Elysia()
+.use(
+cors({
+origin: "http://localhost:3000",
+credentials: true,
+allowedHeaders: ["Content-Type", "Authorization"],
+methods: ["GET", "POST", "OPTIONS"],
+}),
+)
+.get("/", () => "M-Pesa Payment API")
+.get("/health", () => ({ status: "ok" }))
+.group("/api", (app) => app.use(mpesa.app))
+.listen(3004);
+
+console.log("Registered routes:");
+app.routes.forEach((route) => {
+console.log(`${route.method} ${route.path}`);
+});
+
+console.log(
+`Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
+);
+
+````
+  </Tab>
+
+  <Tab value="Express">
+```typescript
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { createMpesa } from "@singularity-payments/express";
+
+const app = express();
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  }),
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`, req.body);
+  next();
+});
+
+const mpesa = createMpesa({
+  consumerKey: process.env.MPESA_CONSUMER_KEY!,
+  consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
+  passkey: process.env.MPESA_PASSKEY!,
+  shortcode: process.env.MPESA_SHORTCODE!,
+  environment: "sandbox",
+  callbackUrl: `https://your-domain.ngrok-free.dev/api/mpesa/callback`,
+});
+
+const mpesaRouter = express.Router();
+mpesa.router(mpesaRouter);
+app.use("/api/mpesa", mpesaRouter);
+
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  res.status(500).json({
+    success: false,
+    error: err.message || "Internal server error",
+  });
+});
+
+app.listen(3001, () => {
+  console.log("Server running on port 3001");
+  console.log("Environment variables loaded:", {
+    hasConsumerKey: !!process.env.MPESA_CONSUMER_KEY,
+    hasConsumerSecret: !!process.env.MPESA_CONSUMER_SECRET,
+    hasPasskey: !!process.env.MPESA_PASSKEY,
+    hasShortcode: !!process.env.MPESA_SHORTCODE,
+  });
+});
+````
+
+  </Tab>
+
+  <Tab value="Fastify">
+```typescript
+import Fastify from "fastify";
+import cors from "@fastify/cors";
+import { config } from "dotenv";
+import { createMpesa } from "@singularity-payments/fastify";
+
+config();
+
+const fastify = Fastify({
+logger: true,
+});
+
+fastify.register(cors, {
+origin: "http://localhost:3000",
+credentials: true,
+});
+
+const mpesa = createMpesa({
+consumerKey: process.env.MPESA_CONSUMER_KEY!,
+consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
+passkey: process.env.MPESA_PASSKEY!,
+shortcode: process.env.MPESA_SHORTCODE!,
+environment: "sandbox",
+callbackUrl: `https://your-domain.ngrok-free.dev/api/mpesa/callback`,
+});
+
+fastify.register(
+async (instance) => {
+mpesa.router(instance);
+},
+{ prefix: "/api/mpesa" },
+);
+
+const start = async () => {
+try {
+await fastify.listen({ port: 3003, host: "0.0.0.0" });
+console.log("Server running on port 3003");
+} catch (err) {
+fastify.log.error(err);
+process.exit(1);
+}
+};
+
+start();
+
+````
+  </Tab>
+
+  <Tab value="Hono">
+```typescript
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+import { config } from "dotenv";
+import { createMpesa } from "@singularity-payments/hono";
+import { cors } from "hono/cors";
+
+config();
+
+const app = new Hono();
+
+app.use("/api/*", cors());
+app.use(
+  "/api/*",
+  cors({
+    origin: "http://localhost:3000",
+    allowHeaders: ["X-Custom-Header", "Upgrade-Insecure-Requests"],
+    allowMethods: ["POST", "GET", "OPTIONS"],
+    exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
+
+const mpesa = createMpesa({
+  consumerKey: process.env.MPESA_CONSUMER_KEY!,
+  consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
+  passkey: process.env.MPESA_PASSKEY!,
+  shortcode: process.env.MPESA_SHORTCODE!,
+  environment: "sandbox",
+  callbackUrl: `https://your-domain.ngrok-free.dev/api/mpesa/callback`,
+});
+
+app.route("/api/mpesa", mpesa.app);
+
+serve({
+  fetch: app.fetch,
+  port: 3002,
+});
+
+console.log("Server running on port 3002");
+````
+
+  </Tab>
+</Tabs>
+
+## Create API Route ( Only for Next.js SvelteKit, Nuxt.js)
+
+Create a catch-all API route to handle all M-Pesa operations.
+This only applies to:
+
+- SvelteKit
+- Next.js
+- Nuxt.js
 
 ```typescript title="app/api/mpesa/[...mpesa]/route.ts"
 import { mpesa } from "~/lib/mpesa";
@@ -323,5 +836,4 @@ Enter your M-Pesa PIN to complete the payment
 ## What's Next
 
 - Learn about [Configuration Options](/docs/getting-started/configuration)
-- Explore [API Reference](/docs/api-reference/mpesa-client)
-- Set up [Database Integration](/docs/guides/database-integration)
+- Explore [API Reference](/docs/api)
