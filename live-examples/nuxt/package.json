@@ -1,0 +1,19 @@
+{
+  "name": "nuxt",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@singularity-payments/nuxt": "0.1.0-alpha.1",
+    "@singularity-payments/vue": "0.1.0-alpha.1",
+    "nuxt": "^4.2.2",
+    "vue": "^3.5.26",
+    "vue-router": "^4.6.4"
+  }
+}

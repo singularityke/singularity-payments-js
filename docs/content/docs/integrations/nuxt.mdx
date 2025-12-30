@@ -1,0 +1,310 @@
+---
+title: Nuxt
+description: Singularity payments can be integrated into your Nuxt application with ease.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+## Install the packages
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+```bash
+npm install @singularity-payments/nuxt @singularity-payments/vue
+```
+
+  </Tab>
+  <Tab value="pnpm">
+```bash
+pnpm add @singularity-payments/nuxt @singularity-payments/vue
+```
+
+  </Tab>
+  <Tab value="yarn">
+```bash
+yarn add @singularity-payments/nuxt @singularity-payments/vue
+```
+
+  </Tab>
+  <Tab value="bun">
+```bash
+bun add @singularity-payments/nuxt @singularity-payments/vue
+```
+
+  </Tab>
+</Tabs>
+
+## Install Ngrok
+
+The API requires a publically accessible url for callbacks. You can use [ngrok](https://ngrok.com/) to expose your local development server to the internet.
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+```bash
+npm install -g ngrok
+```
+
+  </Tab>
+  <Tab value="pnpm">
+```bash
+pnpm add -g ngrok
+```
+
+  </Tab>
+  <Tab value="yarn">
+```bash
+yarn add -g ngrok
+```
+
+  </Tab>
+  <Tab value="bun">
+```bash
+bun add -g ngrok
+```
+
+  </Tab>
+</Tabs>
+<Card
+  title="Guide on Obtaining M-pesa Credentials"
+  description="Learn how to obtain M-pesa credentials for your application."
+  href="/docs/daraja/quick-start"
+/>
+
+## Configure your environmental variables
+
+```bash title=".env.local"
+MPESA_CONSUMER_KEY=your_consumer_key
+MPESA_CONSUMER_SECRET=your_consumer_secret
+MPESA_SHORTCODE=174379 #For STK Push Testing in Sandbox(Replace with your shortcode in production)
+MPESA_PASSKEY=your_passkey
+MPESA_ENVIRONMENT=sandbox # or 'production'
+MPESA_CALLBACK_URL=https://your-app-url.com/api/mpesa/callback
+
+# For STK Push you can just include the 6 above
+# Required for B2C, B2B, Reversal, Transaction Status, and Account Balance
+MPESA_INITIATOR_NAME=testapi #Initiator Name for Sandbox
+MPESA_SECURITY_CREDENTIAL=your_security_credential
+MPESA_RESULT_URL=https://your-app-url.com/api/mpesa/result
+
+```
+
+## Understanding Shortcodes
+
+Your **shortcode** is your business number in the M-Pesa system, it's what customers see when making payments.
+
+### Sandbox (Testing)
+
+Use M-Pesa's provided test shortcodes:
+
+- `174379` - For STK Push testing
+- `600984` - For Till Number testing
+- `600000` - For Paybill testing
+
+These are pre-configured and ready to use immediately.
+
+### Production (Live)
+
+You'll need to apply for your own shortcode through Safaricom's M-Pesa portal:
+
+1. Submit business registration documents
+2. Complete KYC verification
+3. Wait for approval (can take several days)
+4. Receive your unique 5-7 digit shortcode
+
+**Important:** Never mix sandbox and production credentials. Always use the matching shortcode for your environment.
+
+```bash
+# Sandbox
+MPESA_SHORTCODE=174379
+
+# Production
+MPESA_SHORTCODE=123456 # Your approved business number
+```
+
+## Configure Nuxt Config
+
+```typescript title = nuxt.config.ts"
+export default defineNuxtConfig({
+  compatibilityDate: "2025-07-15", // Keep this as it is in your own project
+  devtools: { enabled: true },
+  runtimeConfig: {
+    mpesaConsumerKey: process.env.MPESA_CONSUMER_KEY,
+    mpesaConsumerSecret: process.env.MPESA_CONSUMER_SECRET,
+    mpesaPasskey: process.env.MPESA_PASSKEY,
+    mpesaShortcode: process.env.MPESA_SHORTCODE,
+    mpesaEnvironment: process.env.MPESA_ENVIRONMENT,
+    mpesaCallbackUrl: process.env.MPESA_CALLBACK_URL,
+    mpesaInitiatorName: process.env.MPESA_INITIATOR_NAME,
+    mpesaSecurityCredential: process.env.MPESA_SECURITY_CREDENTIAL,
+    mpesaResultUrl: process.env.MPESA_RESULT_URL,
+    mpesaTimeoutUrl: process.env.MPESA_TIMEOUT_URL,
+  },
+});
+```
+
+## Configure the Mpesa SDK on the Server
+
+```typescript title="server/utils/mpesa.ts"
+import { createMpesa } from "@singularity-payments/nuxt";
+
+const config = useRuntimeConfig();
+
+export const mpesa = createMpesa(
+  {
+    consumerKey: config.mpesaConsumerKey,
+    consumerSecret: config.mpesaConsumerSecret,
+    passkey: config.mpesaPasskey,
+    shortcode: config.mpesaShortcode,
+    environment:
+      (config.mpesaEnvironment as "sandbox" | "production") || "sandbox",
+    callbackUrl: config.mpesaCallbackUrl,
+    initiatorName: "testapi",
+    securityCredential: config.mpesaSecurityCredential,
+    resultUrl: config.mpesaResultUrl,
+    timeoutUrl: config.mpesaTimeoutUrl,
+  },
+  {
+    callbackOptions: {
+      onSuccess: async (data) => {
+        console.log("Payment successful:", {
+          amount: data.amount,
+          phone: data.phoneNumber,
+          receipt: data.mpesaReceiptNumber,
+          transactionDate: data.transactionDate,
+        });
+        // TODO: Save to database
+      },
+      onFailure: async (data) => {
+        console.log("Payment failed:", {
+          resultCode: data.resultCode,
+          resultDesc: data.resultDescription,
+        });
+        // TODO: Update database
+      },
+    },
+  },
+);
+```
+
+## Configure the Catch All Route
+
+```typescript title="src/routes/api/mpesa/[...path].ts"
+import { mpesa } from "../../utils/mpesa";
+
+export default mpesa.handlers.catchAll;
+```
+
+## Configure the Mpesa SDK on the Client
+
+```typescript title="composables/useMpesa.ts"
+import { createMpesaClient } from "@singularity-payments/vue";
+
+export const useMpesa = () => {
+  const mpesaClient = createMpesaClient({
+    baseUrl: "",
+  });
+
+  return {
+    mpesaClient,
+  };
+};
+```
+
+## Start Ngrok
+
+The Daraja api requires a publically accessible callback url for callbacks
+
+```bash
+ngrok http 3000 # whatever port your server is running on
+```
+
+Copy paste the url from ngrok into the env variable `MPESA_CALLBACK_URL`.
+
+```bash title=".env.local"
+MPESA_CALLBACK_URL=https://your-ngrok-url.ngrok.free/api/mpesa/callback # make sure you include the /api/mpesa/callback
+```
+
+## Use the Mpesa SDK on the Client
+
+```vue
+<template>
+  <div class="container">
+    <h1>M-Pesa Payment</h1>
+
+    <form @submit.prevent="pay">
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input
+          id="phone"
+          v-model="phoneNumber"
+          type="tel"
+          placeholder="254708374149"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount (KES)</label>
+        <input id="amount" v-model="amount" type="number" min="1" required />
+      </div>
+
+      <button type="submit" :disabled="loading">
+        {{ loading ? "Processing..." : "Pay Now" }}
+      </button>
+    </form>
+
+    <div v-if="response" class="success">
+      Payment request sent successfully! Check your phone.
+    </div>
+
+    <div v-if="error" class="error">
+      {{ error }}
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useMpesa } from "../composables/useMpesa";
+
+const { mpesaClient } = useMpesa();
+
+const amount = ref(1);
+const phoneNumber = ref("254708374149");
+const loading = ref(false);
+const response = ref(null);
+const error = ref(null);
+
+async function pay() {
+  loading.value = true;
+  error.value = null;
+  response.value = null;
+
+  try {
+    const result = await mpesaClient.stkPush({
+      amount: amount.value,
+      phoneNumber: phoneNumber.value,
+      accountReference: "Singularity",
+      transactionDesc: "Singularity Payments",
+    });
+    response.value = result;
+    console.log(result);
+  } catch (err: any) {
+    error.value = err.message || "Payment failed";
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
+```
+
+The core part of the SDK working here is
+
+```typescript
+const result = await mpesaClient.stkPush({
+  amount: amount.value,
+  phoneNumber: phoneNumber.value,
+  accountReference: "Singularity",
+  transactionDesc: "Singularity Payments",
+});
+```

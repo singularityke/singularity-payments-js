@@ -1,19 +1,18 @@
 import { createMpesa } from '@singularity-payments/sveltekit';
+import { env } from '$env/dynamic/private';
 
 export const mpesa = createMpesa(
 	{
-		consumerKey: process.env.MPESA_CONSUMER_KEY!,
-		consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
-		passkey: process.env.MPESA_PASSKEY!,
-		shortcode: process.env.MPESA_SHORTCODE!,
-		environment: (process.env.MPESA_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
-		callbackUrl: process.env.MPESA_CALLBACK_URL!,
-
-		// Required for B2C, B2B, Reversal, Transaction Status, and Account Balance
+		consumerKey: env.MPESA_CONSUMER_KEY,
+		consumerSecret: env.MPESA_CONSUMER_SECRET,
+		passkey: env.MPESA_PASSKEY,
+		shortcode: env.MPESA_SHORTCODE,
+		environment: (env.MPESA_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+		callbackUrl: env.MPESA_CALLBACK_URL,
 		initiatorName: 'testapi',
-		securityCredential: process.env.MPESA_SECURITY_CREDENTIAL!,
-		resultUrl: process.env.MPESA_RESULT_URL!,
-		timeoutUrl: process.env.MPESA_TIMEOUT_URL!
+		securityCredential: env.MPESA_SECURITY_CREDENTIAL,
+		resultUrl: env.MPESA_RESULT_URL,
+		timeoutUrl: env.MPESA_TIMEOUT_URL
 	},
 	{
 		callbackOptions: {
@@ -24,19 +23,13 @@ export const mpesa = createMpesa(
 					receipt: data.mpesaReceiptNumber,
 					transactionDate: data.transactionDate
 				});
-
 				// TODO: Save to database
-				// await db.transaction.update({
-				//   where: { CheckoutRequestID: data.CheckoutRequestID },
-				//   data: { status: 'completed', mpesaReceiptNumber: data.mpesaReceiptNumber }
-				// });
 			},
 			onFailure: async (data) => {
-				console.log(' Payment failed:', {
+				console.log('Payment failed:', {
 					resultCode: data.resultCode,
 					resultDesc: data.resultDescription
 				});
-
 				// TODO: Update database
 			}
 		}
