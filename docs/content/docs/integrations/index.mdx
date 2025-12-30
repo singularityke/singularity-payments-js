@@ -33,6 +33,37 @@ bun add @singularity-payments/nextjs @singularity-payments/react
 
   </Tab>
 </Tabs>
+
+## Install Ngrok
+
+The API requires a publically accessible url for callbacks. You can use [ngrok](https://ngrok.com/) to expose your local development server to the internet.
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+```bash
+npm install -g ngrok
+```
+
+  </Tab>
+  <Tab value="pnpm">
+```bash
+pnpm add -g ngrok
+```
+
+  </Tab>
+  <Tab value="yarn">
+```bash
+yarn add -g ngrok
+```
+
+  </Tab>
+  <Tab value="bun">
+```bash
+bun add -g ngrok
+```
+
+  </Tab>
+</Tabs>
 <Card
   title="Guide on Obtaining M-pesa Credentials"
   description="Learn how to obtain M-pesa credentials for your application."
@@ -47,13 +78,14 @@ MPESA_CONSUMER_SECRET=your_consumer_secret
 MPESA_SHORTCODE=174379 #For STK Push Testing in Sandbox(Replace with your shortcode in production)
 MPESA_PASSKEY=your_passkey
 MPESA_ENVIRONMENT=sandbox # or 'production'
-NEXT_PUBLIC_APP_URL=https://your-app-url.com
+MPESA_CALLBACK_URL=https://your-app-url.com/api/mpesa/callback
+
 # For STK Push you can just include the 6 above
 # Required for B2C, B2B, Reversal, Transaction Status, and Account Balance
 MPESA_INITIATOR_NAME=testapi #Initiator Name for Sandbox
 MPESA_SECURITY_CREDENTIAL=your_security_credential
 MPESA_RESULT_URL=https://your-app-url.com/api/mpesa/result
-MPESA_CALLBACK_URL=https://your-app-url.com/api/mpesa/callback
+
 ```
 
 ## Understanding Shortcodes
@@ -139,6 +171,14 @@ export const mpesa = createMpesa(
 );
 ```
 
+## Configure the Catch All Route
+
+```typescript title="app/api/mpesa/[...mpesa]/route.ts"
+import { mpesa } from "@/lib/mpesa";
+
+export const { POST } = mpesa.handlers.catchAll;
+```
+
 ## Configure the Mpesa SDK on the Client
 
 ```typescript title="lib/mpesa-client.ts"
@@ -149,8 +189,78 @@ export const mpesaClient = createMpesaClient({
 });
 ```
 
-## Use the Mpesa SDK on the Client
+## Start Ngrok
 
+The Daraja api requires a publically accessible callback url for callbacks
+
+```bash
+ngrok http 3000 # whatever port your server is running on
 ```
 
+Copy paste the url from ngrok into the env variable `MPESA_CALLBACK_URL`.
+
+```bash title=".env.local"
+MPESA_CALLBACK_URL=https://your-ngrok-url.ngrok.free/api/mpesa/callback # make sure you include the /api/mpesa/callback
+```
+
+## Use the Mpesa SDK on the Client
+
+```tsx
+"use client";
+
+import { mpesaClient } from "@/lib/mpesa-client";
+import { useState } from "react";
+
+export default function PaymentTest() {
+  const [amount, setAmount] = useState(1);
+  const [phoneNumber, setPhoneNumber] = useState("254708374149"); // This is the test phone number replace with your phone number
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const { data, error } = await mpesaClient.stkPush({
+      amount,
+      phoneNumber,
+
+      accountReference: "Singularity",
+      transactionDesc: "Singularity Payment",
+    });
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(data);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Amount:
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
+        />
+      </label>
+      <label>
+        Phone Number:
+        <input
+          type="tel"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+      </label>
+      <button type="submit">Pay</button>
+    </form>
+  );
+}
+```
+
+The core part of the SDK working here is
+
+```typescript
+const { data, error } = await mpesaClient.stkPush({
+  amount,
+  phoneNumber,
+  accountReference: "Singularity",
+  transactionDesc: "Singularity Payment",
+});
 ```

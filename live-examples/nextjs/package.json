@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@singularity-payments/nextjs": "0.1.0-alpha.4",
-    "@singularity-payments/react": "0.1.0-alpha.2",
+    "@singularity-payments/react": "0.1.0-alpha.3",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
