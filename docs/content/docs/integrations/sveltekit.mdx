@@ -124,7 +124,7 @@ MPESA_SHORTCODE=123456 # Your approved business number
 ## Configure the Mpesa SDK on the Server
 
 ```typescript title="lib/mpesa.ts"
-import { createMpesa } from "@singularity-payments/nextjs";
+import { createMpesa } from "@singularity-payments/sveltekit";
 
 export const mpesa = createMpesa(
   {
@@ -173,16 +173,16 @@ export const mpesa = createMpesa(
 
 ## Configure the Catch All Route
 
-```typescript title="app/api/mpesa/[...mpesa]/route.ts"
-import { mpesa } from "@/lib/mpesa";
+```typescript title="src/routes/api/mpesa/[...path]/+server.ts"
+import { mpesa } from "$lib/mpesa";
 
-export const { POST } = mpesa.handlers.catchAll;
+export const POST = mpesa.handlers.catchAll.POST;
 ```
 
 ## Configure the Mpesa SDK on the Client
 
 ```typescript title="lib/mpesa-client.ts"
-import { createMpesaClient } from "@singularity-payments/react";
+import { createMpesaClient } from "@singularity-payments/svelte";
 
 export const mpesaClient = createMpesaClient({
   baseUrl: "", //If they are running on different ports you can include eg("http://localhost:3000").
