@@ -125,22 +125,21 @@ MPESA_SHORTCODE=123456 # Your approved business number
 
 ```typescript title="lib/mpesa.ts"
 import { createMpesa } from "@singularity-payments/sveltekit";
+import { env } from "$env/dynamic/private";
 
 export const mpesa = createMpesa(
   {
-    consumerKey: process.env.MPESA_CONSUMER_KEY!,
-    consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
-    passkey: process.env.MPESA_PASSKEY!,
-    shortcode: process.env.MPESA_SHORTCODE!,
+    consumerKey: env.MPESA_CONSUMER_KEY,
+    consumerSecret: env.MPESA_CONSUMER_SECRET,
+    passkey: env.MPESA_PASSKEY,
+    shortcode: env.MPESA_SHORTCODE,
     environment:
-      (process.env.MPESA_ENVIRONMENT as "sandbox" | "production") || "sandbox",
-    callbackUrl: process.env.MPESA_CALLBACK_URL!,
-
-    // Required for B2C, B2B, Reversal, Transaction Status, and Account Balance
+      (env.MPESA_ENVIRONMENT as "sandbox" | "production") || "sandbox",
+    callbackUrl: env.MPESA_CALLBACK_URL,
     initiatorName: "testapi",
-    securityCredential: process.env.MPESA_SECURITY_CREDENTIAL!,
-    resultUrl: process.env.MPESA_RESULT_URL!,
-    timeoutUrl: process.env.MPESA_TIMEOUT_URL!,
+    securityCredential: env.MPESA_SECURITY_CREDENTIAL,
+    resultUrl: env.MPESA_RESULT_URL,
+    timeoutUrl: env.MPESA_TIMEOUT_URL,
   },
   {
     callbackOptions: {
@@ -151,19 +150,13 @@ export const mpesa = createMpesa(
           receipt: data.mpesaReceiptNumber,
           transactionDate: data.transactionDate,
         });
-
         // TODO: Save to database
-        // await db.transaction.update({
-        //   where: { CheckoutRequestID: data.CheckoutRequestID },
-        //   data: { status: 'completed', mpesaReceiptNumber: data.mpesaReceiptNumber }
-        // });
       },
       onFailure: async (data) => {
-        console.log(" Payment failed:", {
+        console.log("Payment failed:", {
           resultCode: data.resultCode,
           resultDesc: data.resultDescription,
         });
-
         // TODO: Update database
       },
     },
@@ -205,53 +198,69 @@ MPESA_CALLBACK_URL=https://your-ngrok-url.ngrok.free/api/mpesa/callback # make s
 
 ## Use the Mpesa SDK on the Client
 
-```tsx
-"use client";
+```svelte
+<script>
+	import { mpesaClient } from '$lib/mpesa-client';
 
-import { mpesaClient } from "@/lib/mpesa-client";
-import { useState } from "react";
+	let amount = 1;
+	let phoneNumber = '254708374149'; // Default Phone Number Provided, you can change it to your own to get the request
+	let loading = false;
+	let response = null;
+	let error = null;
 
-export default function PaymentTest() {
-  const [amount, setAmount] = useState(1);
-  const [phoneNumber, setPhoneNumber] = useState("254708374149"); // This is the test phone number replace with your phone number
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const { data, error } = await mpesaClient.stkPush({
-      amount,
-      phoneNumber,
+	async function pay() {
+		loading = true;
+		error = null;
+		response = null;
 
-      accountReference: "Singularity",
-      transactionDesc: "Singularity Payment",
-    });
-    if (error) {
-      console.error(error);
-    } else {
-      console.log(data);
-    }
-  }
+		try {
+			const result = await mpesaClient.stkPush({
+				amount,
+				phoneNumber,
+				accountReference: 'Singularity',
+				transactionDesc: 'Singularity Payments'
+			});
+			response = result;
+			console.log(result);
+		} catch (err) {
+			error = err.message || 'Payment failed';
+			console.error(err);
+		} finally {
+			loading = false;
+		}
+	}
+</script>
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Amount:
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-        />
-      </label>
-      <label>
-        Phone Number:
-        <input
-          type="tel"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-        />
-      </label>
-      <button type="submit">Pay</button>
-    </form>
-  );
-}
+<div class="container">
+	<h1>M-Pesa Payment</h1>
+
+	<form on:submit|preventDefault={pay}>
+		<div class="form-group">
+			<label for="phone">Phone Number</label>
+			<input id="phone" type="tel" bind:value={phoneNumber} placeholder="254708374149" required />
+		</div>
+
+		<div class="form-group">
+			<label for="amount">Amount (KES)</label>
+			<input id="amount" type="number" bind:value={amount} min="1" required />
+		</div>
+
+		<button type="submit" disabled={loading}>
+			{loading ? 'Processing...' : 'Pay Now'}
+		</button>
+	</form>
+
+	{#if response}
+		<div class="success">Payment request sent successfully! Check your phone.</div>
+	{/if}
+
+	{#if error}
+		<div class="error">
+			{error}
+		</div>
+	{/if}
+</div>
+
 ```
 
 The core part of the SDK working here is

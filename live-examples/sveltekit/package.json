@@ -38,7 +38,7 @@
 		"vite": "^7.2.6"
 	},
 	"dependencies": {
-		"@singularity-payments/svelte": "0.1.0-alpha.1",
-		"@singularity-payments/sveltekit": "0.1.0-alpha.1"
+		"@singularity-payments/svelte": "0.1.0-alpha.2",
+		"@singularity-payments/sveltekit": "0.1.0-alpha.2"
 	}
 }
