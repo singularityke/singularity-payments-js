@@ -337,8 +337,8 @@ NEXT_PUBLIC_APP_URL=https://your-ngrok-url.ngrok-free.app
 Create a server configuration file:
 
 <Tabs items={["Next.js", "SvelteKit", "Nuxt", "Elysia", "Express", "Fastify", "Hono"]}>
-  <Tab value="Next.js">
-```typescript
+  <Tab value="Next.js" >
+```typescript title="lib/mpesa.ts"
 import { createMpesa } from "@singularity-payments/nextjs";
 
 export const mpesa = createMpesa(
@@ -366,7 +366,7 @@ export const mpesa = createMpesa(
   </Tab>
 
   <Tab value="SvelteKit">
-```typescript
+```typescript title="lib/mpesa.ts"
 import { createMpesa } from '@singularity-payments/sveltekit';
 import {
   MPESA_CONSUMER_KEY,
@@ -399,7 +399,7 @@ export const mpesa = createMpesa(
   </Tab>
 
   <Tab value="Nuxt">
-```typescript
+```typescript title="server/utils/mpesa.ts"
 import { createMpesa } from "@singularity-payments/nuxt";
 
 const config = useRuntimeConfig();
@@ -635,151 +635,86 @@ This only applies to:
 - Next.js
 - Nuxt.js
 
-```typescript title="app/api/mpesa/[...mpesa]/route.ts"
+<Tabs items={["Next.js", "SvelteKit", "Nuxt.js"]}>
+  <Tab value="Next.js">
+``` typescript title="app/api/mpesa/[...mpesa]/route.ts"
 import { mpesa } from "~/lib/mpesa";
 
 export const { POST } = mpesa.handlers.catchAll;
 ```
+  </Tab>
+  <Tab value="SvelteKit">
+``` typescript title="src/routes/api/mpesa/[...path]/+server.ts"
+import { mpesa } from '$lib/mpesa';
+
+export const POST = mpesa.handlers.catchAll.POST;
+
+````
+  </Tab>
+  <Tab value="Nuxt.js">
+``` typescript title="server/api/mpesa/[...path].post.ts"
+import { mpesa } from "../../utils/mpesa";
+
+export default mpesa.handlers.catchAll;
+````
+
+  </Tab>
+</Tabs>
 
 This single route handles all M-Pesa operations including callbacks, payment initiation, and status queries.
 
-## Create Payment Form
+## Make the client hander
+
+<Tabs items={["React", "Svelte", "Vue"]}>
+  <Tab value="React">
+``` typescript title="lib/mpesa-client.ts"
+import { createMpesaClient } from "@singularity-payments/react";
+
+export const mpesaClient = createMpesaClient({
+  baseUrl: "http://localhost:3000", // your backend url(Use "" if the backend and frontend are on the same port)
+});
+
+````
+  </Tab>
+  <Tab value="Svelte">
+``` typescript title="lib/mpesa-client.ts"
+import { createMpesaClient } from "@singularity-payments/svelte";
+
+export const mpesaClient = createMpesaClient({
+  baseUrl: "http://localhost:3000", // your backend url(Use "" if the backend and frontend are on the same port)
+});
+
+````
+
+  </Tab>
+  <Tab value="Vue">
+``` typescript title="lib/mpesa-client.ts"
+import { createMpesaClient } from "@singularity-payments/vue";
+
+export const mpesaClient = createMpesaClient({
+  baseUrl: "http://localhost:3000", // your backend url(Use "" if the backend and frontend are on the same port)
+});
+
+````
+
+  </Tab>
+</Tabs>
+
+## Initiate an STK Push
 
 Create a client component for handling payments:
 
-```tsx title="components/payment-form.tsx"
-"use client";
-
-import { useState } from "react";
-import { useMpesaPayment, usePaymentStatus } from "@singularity-payments/react";
-
-export function PaymentForm() {
-  const [amount, setAmount] = useState("100");
-  const [phoneNumber, setPhoneNumber] = useState("254712345678");
-
-  const { initiatePayment, state, CheckoutRequestID, error, reset } =
-    useMpesaPayment();
-  const { status, isSuccess, isFailed } = usePaymentStatus({
-    CheckoutRequestID,
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await initiatePayment({
-      amount: Number(amount),
-      phoneNumber,
-      accountReference: "ORDER001",
-      transactionDesc: "Payment",
-    });
-  };
-
-  if (isSuccess) {
-    return (
-      <div className="mx-auto max-w-md rounded-lg border border-green-600 bg-green-50 p-6 dark:border-green-400 dark:bg-green-950">
-        <h3 className="mb-2 text-lg font-semibold text-green-900 dark:text-green-100">
-          Payment Successful
-        </h3>
-        <p className="mb-4 text-sm text-green-800 dark:text-green-200">
-          {status?.ResultDesc}
-        </p>
-        <button
-          onClick={reset}
-          className="w-full rounded-md border border-green-600 bg-transparent px-4 py-2 text-green-900 hover:bg-green-100 dark:border-green-400 dark:text-green-100 dark:hover:bg-green-900"
-        >
-          Make Another Payment
-        </button>
-      </div>
-    );
-  }
-
-  if (isFailed && status) {
-    return (
-      <div className="mx-auto max-w-md rounded-lg border border-red-600 bg-red-50 p-6 dark:border-red-400 dark:bg-red-950">
-        <h3 className="mb-2 text-lg font-semibold text-red-900 dark:text-red-100">
-          Payment Failed
-        </h3>
-        <p className="mb-4 text-sm text-red-800 dark:text-red-200">
-          {status.ResultDesc}
-        </p>
-        <button
-          onClick={reset}
-          className="w-full rounded-md border border-red-600 bg-transparent px-4 py-2 text-red-900 hover:bg-red-100 dark:border-red-400 dark:text-red-100 dark:hover:bg-red-900"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mx-auto max-w-md rounded-lg border p-6">
-      <h2 className="mb-6 text-2xl font-bold">M-Pesa Payment</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="mb-2 block text-sm font-medium">Amount (KES)</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            min="1"
-            required
-            disabled={state !== "idle"}
-            className="w-full rounded-md border px-3 py-2"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium">Phone Number</label>
-          <input
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="254712345678"
-            required
-            disabled={state !== "idle"}
-            className="w-full rounded-md border px-3 py-2"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={state !== "idle"}
-          className="w-full rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-        >
-          {state === "initiating" && "Processing..."}
-          {state === "pending" && "Check Your Phone"}
-          {state === "idle" && "Pay with M-Pesa"}
-        </button>
-      </form>
-
-      {error && (
-        <div className="mt-4 rounded-md border border-red-600 bg-red-50 p-3 dark:border-red-400 dark:bg-red-950">
-          <p className="text-sm text-red-800 dark:text-red-200">
-            {error.message}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
+```tsx "
+// make sure to import mpesaClient
+const { data, error } = await mpesaClient.stkPush({
+     amount: 1,
+     phoneNumber: phone,
+     accountReference: "singularity",
+     transactionDesc: "Quick Start",
+   });
 ```
 
-## Use in Your Page
 
-Import and use the payment form in any page:
-
-```tsx title="app/page.tsx"
-import { PaymentForm } from "~/components/payment-form";
-
-export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <PaymentForm />
-    </main>
-  );
-}
-```
 
 ## Test Your Integration
 
@@ -809,17 +744,13 @@ Update your `.env.local` with the ngrok URL and restart your dev server
 </Step>
 <Step>
 
-Navigate to your page with the payment form
+Navigate to your page with payment integrated
 
 </Step>
+
 <Step>
 
-Enter a test amount and phone number
-
-</Step>
-<Step>
-
-Click Pay with M-Pesa and check your phone for the STK Push prompt
+Initiate the transaction and check your phone for the STK Push prompt
 
 </Step>
 <Step>
@@ -835,5 +766,9 @@ Enter your M-Pesa PIN to complete the payment
 
 ## What's Next
 
-- Learn about [Configuration Options](/docs/getting-started/configuration)
 - Explore [API Reference](/docs/api)
+
+
+
+
+````
