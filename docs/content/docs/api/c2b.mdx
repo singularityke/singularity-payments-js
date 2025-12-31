@@ -29,6 +29,78 @@ C2B (Customer to Business) payments allow customers to initiate payments directl
 | **Use Case**            | Online checkout, invoices       | Walk-in payments, offline transactions  |
 | **Customer Experience** | Receives prompt automatically   | Manually enters Paybill/Till and amount |
 
+## Add a new catch all route
+
+Mpesa does not allow us to register urls with the word mpesa in them so we will add a new catch all route( Fix for Elysia coming soon)
+
+<Tabs items={["Next.js", "SvelteKit", "Nuxt",  "Express", "Fastify", "Hono"]}>
+  <Tab value="Next.js" >
+```typescript title="app/api/payments/[...mpesa]/route.ts"
+import { mpesa } from "@/lib/mpesa";
+
+export const { POST } = mpesa.handlers.catchAll;
+```
+  </Tab>
+
+  <Tab value="SvelteKit">
+```typescript title="src/routes/api/payments/[...path]/+server.ts"
+import { mpesa } from "$lib/mpesa";
+
+export const POST = mpesa.handlers.catchAll.POST;
+```
+  </Tab>
+
+  <Tab value="Nuxt">
+```typescript title="src/routes/api/payments/[...path].ts"
+import { mpesa } from "../../utils/mpesa";
+
+export default mpesa.handlers.catchAll;
+```
+  </Tab>
+
+  <Tab value="Express">
+```typescript
+
+app.use("/api/mpesa", mpesaRouter);
+app.use("/api/payment", mpesaRouter);
+
+````
+
+  </Tab>
+
+  <Tab value="Fastify">
+```typescript
+
+
+fastify.register(
+async (instance) => {
+mpesa.router(instance);
+},
+{ prefix: "/api/mpesa" },
+);
+fastify.register(
+async (instance) => {
+mpesa.router(instance);
+},
+{ prefix: "/api/payments" },
+);
+
+
+
+````
+
+  </Tab>
+
+  <Tab value="Hono">
+```typescript
+
+app.route("/api/mpesa", mpesa.app);
+app.route("/api/payments", mpesa.app)
+
+````
+
+  </Tab>
+</Tabs>
 ## Registering C2B URLs
 
 Before receiving C2B payments, you must register your validation and confirmation URLs with M-Pesa.
@@ -42,7 +114,7 @@ Before receiving C2B payments, you must register your validation and confirmatio
     confirmationURL: "https://yourdomain.com/api/mpesa/c2b-confirmation",
     validationURL: "https://yourdomain.com/api/mpesa/c2b-validation",
   });
-  
+
   console.log(response);
   // {
   //   OriginatorCoversationID: "29115-34620561-1",
@@ -217,16 +289,7 @@ interface ParsedC2BCallback {
 }
 ```
 
-### Next.js Route Handler
 
-The SDK automatically handles C2B callbacks through the catch-all handler:
-
-```typescript
-// app/api/mpesa/[...mpesa]/route.ts
-import { mpesa } from "@/lib/mpesa";
-
-export const { POST } = mpesa.handlers.catchAll;
-```
 
 This single route handles:
 
@@ -234,27 +297,14 @@ This single route handles:
 - `/api/mpesa/c2b-confirmation` - Confirmation requests
 - All other M-Pesa callbacks
 
-## Testing C2B Payments
 
-### Using Sandbox
-
-In the sandbox environment, you can simulate C2B payments by having a test customer send money to your test shortcode:
-
-1. Use a test M-Pesa phone number (provided by Safaricom)
-2. Navigate to M-Pesa menu on test phone
-3. Select "Lipa na M-Pesa" → "Pay Bill"
-4. Enter your test shortcode (e.g., 600000)
-5. Enter account number (bill reference)
-6. Enter amount
-7. Enter M-Pesa PIN
-
-Your validation and confirmation callbacks will be triggered automatically.
 
 ### Local Development with ngrok
 
 ```bash
 # Start your Next.js app
 npm run dev
+
 
 # In another terminal, start ngrok
 ngrok http 3000
@@ -425,15 +475,6 @@ onC2BValidation: async (data) => {
 },
 ```
 
-### Customer Privacy Concerns
-
-**Note**: M-Pesa masks customer phone numbers in C2B callbacks. You'll only receive:
-
-- First name
-- Partial phone number (first few digits visible)
-- Full transaction details
-
-This is by design for customer privacy. If you need to link payments to specific customers, use the bill reference number (account number) that customers enter when paying.
 
 ## Customer Instructions
 
@@ -483,3 +524,4 @@ Provide clear instructions to your customers on how to pay:
 </Cards>
 
 ---
+````
