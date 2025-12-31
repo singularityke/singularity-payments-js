@@ -2,7 +2,7 @@
 	import { mpesaClient } from '$lib/mpesa-client';
 
 	let amount = 1;
-	let phoneNumber = '254708374149';
+	let phoneNumber = '254712345678';
 	let loading = false;
 	let response = null;
 	let error = null;
@@ -36,7 +36,7 @@
 	<form on:submit|preventDefault={pay}>
 		<div class="form-group">
 			<label for="phone">Phone Number</label>
-			<input id="phone" type="tel" bind:value={phoneNumber} placeholder="254708374149" required />
+			<input id="phone" type="tel" bind:value={phoneNumber} placeholder="254712345678" required />
 		</div>
 
 		<div class="form-group">

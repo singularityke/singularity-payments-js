@@ -1,0 +1,130 @@
+---
+title: API Reference
+description: Complete reference for all M-Pesa operations in Singularity Payments SDK
+---
+
+# API Reference
+
+Complete documentation for all M-Pesa operations available in the Singularity Payments SDK.
+
+## Overview
+
+The Singularity Payments SDK provides a type-safe, framework-agnostic way to integrate M-Pesa payments into your application. All operations are built on top of the `@singularity-payments/core` package with framework-specific adapters.
+
+## Available Operations
+
+### Payment Operations
+
+<Cards>
+  <Card title="STK Push" href="/api-reference/stk-push">
+    Initiate M-Pesa STK Push (Lipa Na M-Pesa Online) payments
+  </Card>
+
+<Card title="C2B Payments" href="/api-reference/c2b">
+  Customer to Business payments with validation and confirmation
+</Card>
+
+<Card title="B2C Payments" href="/api-reference/b2c">
+  Send money from your business to customers
+</Card>
+
+  <Card title="B2B Payments" href="/api-reference/b2b">
+    Business to Business payment transfers
+  </Card>
+</Cards>
+
+### Transaction Management
+
+<Cards>
+  <Card title="Transaction Status" href="/api-reference/transaction-status">
+    Query the status of any M-Pesa transaction
+  </Card>
+
+<Card title="Account Balance" href="/api-reference/account-balance">
+  Check your M-Pesa business account balance
+</Card>
+
+<Card title="Reversals" href="/api-reference/reversal">
+  Reverse completed transactions
+</Card>
+
+  <Card title="Dynamic QR" href="/api-reference/dynamic-qr">
+    Generate dynamic QR codes for payments
+  </Card>
+</Cards>
+
+### SDK Features
+
+<Cards>
+  <Card title="Configuration" href="/api-reference/configuration">
+    Configure the SDK with your M-Pesa credentials
+  </Card>
+
+<Card title="Callbacks & Webhooks" href="/api-reference/callbacks">
+  Handle M-Pesa callbacks and webhook events
+</Card>
+
+<Card title="Error Handling" href="/api-reference/error-handling">
+  Handle errors and edge cases gracefully
+</Card>
+
+  <Card title="Rate Limiting" href="/api-reference/rate-limiting">
+    Built-in rate limiting and retry logic
+  </Card>
+</Cards>
+
+## Quick Example
+
+```typescript
+import { MpesaClient } from "@singularity-payments/core";
+
+const client = new MpesaClient({
+  consumerKey: process.env.MPESA_CONSUMER_KEY,
+  consumerSecret: process.env.MPESA_CONSUMER_SECRET,
+  passkey: process.env.MPESA_PASSKEY,
+  shortcode: process.env.MPESA_SHORTCODE,
+  environment: "sandbox",
+  callbackUrl: "https://yourdomain.com/api/mpesa/callback",
+});
+
+// Initiate STK Push
+const response = await client.stkPush({
+  amount: 100,
+  phoneNumber: "254712345678",
+  accountReference: "INV-001",
+  transactionDesc: "Payment for invoice",
+});
+```
+
+## Common Configuration
+
+All SDK packages require the following M-Pesa credentials:
+
+| Field                | Required    | Description                   |
+| -------------------- | ----------- | ----------------------------- |
+| `consumerKey`        | ✅          | M-Pesa API consumer key       |
+| `consumerSecret`     | ✅          | M-Pesa API consumer secret    |
+| `passkey`            | ✅          | STK Push passkey              |
+| `shortcode`          | ✅          | M-Pesa business shortcode     |
+| `environment`        | ✅          | `"sandbox"` or `"production"` |
+| `callbackUrl`        | Recommended | URL for receiving callbacks   |
+| `initiatorName`      | For B2C/B2B | Initiator username            |
+| `securityCredential` | For B2C/B2B | Encrypted security credential |
+
+See [Configuration](/api-reference/configuration) for detailed setup instructions.
+
+## Next Steps
+
+<Cards>
+  <Card title="Getting Started" href="getting-started">
+    New to the SDK? Start here
+  </Card>
+
+<Card title="Integration Guides" href="integrations">
+  Framework-specific integration guides
+</Card>
+
+  <Card title="Configuration" href="api/configuration">
+    Configure the SDK for your project
+  </Card>
+</Cards>
