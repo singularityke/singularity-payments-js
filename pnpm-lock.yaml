@@ -235,6 +235,9 @@ importers:
       '@nuxt/hints':
         specifier: 1.0.0-alpha.5
         version: 1.0.0-alpha.5(magicast@0.5.1)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.26(typescript@5.9.3))
+      '@singularity-payments/nuxt':
+        specifier: 0.1.0-alpha.1
+        version: 0.1.0-alpha.1(h3@1.15.4)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2))
       '@singularity-payments/vue':
         specifier: workspace:*
         version: link:../../packages/vue
@@ -326,6 +329,100 @@ importers:
         specifier: ^7.2.6
         version: 7.3.0(@types/node@24.10.4)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
+  live-examples/elysia:
+    dependencies:
+      '@elysiajs/cors':
+        specifier: ^1.4.1
+        version: 1.4.1(elysia@1.4.19(@sinclair/typebox@0.34.45)(exact-mirror@0.2.5(@sinclair/typebox@0.34.45))(file-type@21.2.0)(openapi-types@12.1.3)(typescript@5.9.3))
+      '@singularity-payments/elysia':
+        specifier: 0.1.0-alpha.2
+        version: 0.1.0-alpha.2(elysia@1.4.19(@sinclair/typebox@0.34.45)(exact-mirror@0.2.5(@sinclair/typebox@0.34.45))(file-type@21.2.0)(openapi-types@12.1.3)(typescript@5.9.3))
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      elysia:
+        specifier: latest
+        version: 1.4.19(@sinclair/typebox@0.34.45)(exact-mirror@0.2.5(@sinclair/typebox@0.34.45))(file-type@21.2.0)(openapi-types@12.1.3)(typescript@5.9.3)
+    devDependencies:
+      bun-types:
+        specifier: latest
+        version: 1.3.5
+
+  live-examples/express:
+    dependencies:
+      '@singularity-payments/express':
+        specifier: 0.1.0-alpha.2
+        version: 0.1.0-alpha.2(express@4.22.1)
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      express:
+        specifier: ^4.22.1
+        version: 4.22.1
+    devDependencies:
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.0.3
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  live-examples/fastify:
+    dependencies:
+      '@fastify/cors':
+        specifier: ^11.2.0
+        version: 11.2.0
+      '@singularity-payments/fastify':
+        specifier: 0.1.0-alpha.2
+        version: 0.1.0-alpha.2(fastify@5.6.2)
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      fastify:
+        specifier: ^5.6.2
+        version: 5.6.2
+    devDependencies:
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.0.3
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  live-examples/hono:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.19.6
+        version: 1.19.7(hono@4.11.3)
+      '@singularity-payments/hono':
+        specifier: 0.1.0-alpha.2
+        version: 0.1.0-alpha.2(hono@4.11.3)
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      hono:
+        specifier: ^4.11.3
+        version: 4.11.3
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.17
+        version: 20.19.27
+      tsx:
+        specifier: ^4.7.1
+        version: 4.21.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
   live-examples/nextjs:
     dependencies:
       '@singularity-payments/nextjs':
@@ -372,8 +469,8 @@ importers:
   live-examples/nuxt:
     dependencies:
       '@singularity-payments/nuxt':
-        specifier: 0.1.0-alpha.1
-        version: 0.1.0-alpha.1(h3@1.15.4)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2))
+        specifier: 0.1.0-alpha.3
+        version: 0.1.0-alpha.3(h3@1.15.4)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2))
       '@singularity-payments/vue':
         specifier: 0.1.0-alpha.1
         version: 0.1.0-alpha.1(vue@3.5.26(typescript@5.9.3))
@@ -2884,6 +2981,26 @@ packages:
   '@singularity-payments/core@0.1.0-alpha.1':
     resolution: {integrity: sha512-i8Wa2v/vOsI9ZW9E0SN1bilP831BnbvNUr7nwPYMQ22za5/+9LEOqofea1WoTRIhUiqZNT9udO2si00Gk9B81A==}
 
+  '@singularity-payments/elysia@0.1.0-alpha.2':
+    resolution: {integrity: sha512-oTWCb+VjkvO49Cm8dW0g9UA+XCZ507EKHFzSt4BLdPMa0S44WZLVA7HQMDcRUb02p+lBQqxVEezt6VEAhSQCZg==}
+    peerDependencies:
+      elysia: '>=1.0.0'
+
+  '@singularity-payments/express@0.1.0-alpha.2':
+    resolution: {integrity: sha512-kTzhulwOO8Mkcv/6iJsde66mml21HZ+TzTqZU/WJN46/7nAX2T4oxYXBpWlK5Bclve3gKTEt47MmvSAr4gUj/A==}
+    peerDependencies:
+      express: '>=4.0.0'
+
+  '@singularity-payments/fastify@0.1.0-alpha.2':
+    resolution: {integrity: sha512-5cv+G/cvqEnyC/lYkU7oXfOtSmqnX5D/0ru83Ux3m0shfnwHKeUdg3FyV55aHufNv2ZN4BeoLL72ALFEqn3ngA==}
+    peerDependencies:
+      fastify: '>=4.0.0'
+
+  '@singularity-payments/hono@0.1.0-alpha.2':
+    resolution: {integrity: sha512-bvlJ7L5aeB8ur+19834Ue8SNmx1XN0gDFYBB47cUHdaaBJ7+H89Qbepg+esKnewedW16PaP27ii9C/CvQRMGVg==}
+    peerDependencies:
+      hono: '>=4.0.0'
+
   '@singularity-payments/nextjs@0.1.0-alpha.4':
     resolution: {integrity: sha512-3PEEpNUaWXRUOn1h42l/IqrzEYvePVOC8luT6dO7hRtK6PiUnAWxVFqhe38L/O9ohhCiSLMkw0hQGFaQ8rDbHw==}
     peerDependencies:
@@ -2891,6 +3008,12 @@ packages:
 
   '@singularity-payments/nuxt@0.1.0-alpha.1':
     resolution: {integrity: sha512-DT0qUAzvFBHf2DJ/gNikUjUn7CCBU6FFCezoKI6A21D8qZ/2y60DI14HsskkBZlaqjPWI4f1gW92tYwAWUTi8A==}
+    peerDependencies:
+      h3: '>=1.0.0'
+      nuxt: '>=3.0.0'
+
+  '@singularity-payments/nuxt@0.1.0-alpha.3':
+    resolution: {integrity: sha512-RlX0I972UtrfjTdo7Y/eGoFyIajoOL115HLF/fhKAvuswh9MIGMTG2NkjF7piLlHmwLN3SKeUXRu7h/1KGnuTg==}
     peerDependencies:
       h3: '>=1.0.0'
       nuxt: '>=3.0.0'
@@ -3726,6 +3849,9 @@ packages:
   builtin-modules@5.0.0:
     resolution: {integrity: sha512-bkXY9WsVpY7CvMhKSR6pZilZu9Ln5WDrKVBUXf2S443etkmEO4V58heTecXcUIsNsi4Rx8JUO4NfX1IcQl4deg==}
     engines: {node: '>=18.20'}
+
+  bun-types@1.3.5:
+    resolution: {integrity: sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw==}
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -10232,6 +10358,26 @@ snapshots:
 
   '@singularity-payments/core@0.1.0-alpha.1': {}
 
+  '@singularity-payments/elysia@0.1.0-alpha.2(elysia@1.4.19(@sinclair/typebox@0.34.45)(exact-mirror@0.2.5(@sinclair/typebox@0.34.45))(file-type@21.2.0)(openapi-types@12.1.3)(typescript@5.9.3))':
+    dependencies:
+      '@singularity-payments/core': 0.1.0-alpha.1
+      elysia: 1.4.19(@sinclair/typebox@0.34.45)(exact-mirror@0.2.5(@sinclair/typebox@0.34.45))(file-type@21.2.0)(openapi-types@12.1.3)(typescript@5.9.3)
+
+  '@singularity-payments/express@0.1.0-alpha.2(express@4.22.1)':
+    dependencies:
+      '@singularity-payments/core': 0.1.0-alpha.1
+      express: 4.22.1
+
+  '@singularity-payments/fastify@0.1.0-alpha.2(fastify@5.6.2)':
+    dependencies:
+      '@singularity-payments/core': 0.1.0-alpha.1
+      fastify: 5.6.2
+
+  '@singularity-payments/hono@0.1.0-alpha.2(hono@4.11.3)':
+    dependencies:
+      '@singularity-payments/core': 0.1.0-alpha.1
+      hono: 4.11.3
+
   '@singularity-payments/nextjs@0.1.0-alpha.4(next@16.1.1(@babel/core@7.28.5)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))':
     dependencies:
       '@singularity-payments/core': 0.1.0-alpha.1
@@ -10240,6 +10386,12 @@ snapshots:
   '@singularity-payments/nuxt@0.1.0-alpha.1(h3@1.15.4)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2))':
     dependencies:
       '@singularity-payments/core': 0.1.0-alpha.0
+      h3: 1.15.4
+      nuxt: 4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+
+  '@singularity-payments/nuxt@0.1.0-alpha.3(h3@1.15.4)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2))':
+    dependencies:
+      '@singularity-payments/core': 0.1.0-alpha.1
       h3: 1.15.4
       nuxt: 4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.26)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
 
@@ -11212,6 +11364,10 @@ snapshots:
       ieee754: 1.2.1
 
   builtin-modules@5.0.0: {}
+
+  bun-types@1.3.5:
+    dependencies:
+      '@types/node': 20.19.27
 
   bundle-name@4.1.0:
     dependencies:
