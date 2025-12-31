@@ -203,7 +203,7 @@ MPESA_CALLBACK_URL=https://your-ngrok-url.ngrok.free/api/mpesa/callback # make s
 	import { mpesaClient } from '$lib/mpesa-client';
 
 	let amount = 1;
-	let phoneNumber = '254708374149'; // Default Phone Number Provided, you can change it to your own to get the request
+	let phoneNumber = '254712345678'; // Default Phone Number Provided, you can change it to your own to get the request
 	let loading = false;
 	let response = null;
 	let error = null;
@@ -237,7 +237,7 @@ MPESA_CALLBACK_URL=https://your-ngrok-url.ngrok.free/api/mpesa/callback # make s
 	<form on:submit|preventDefault={pay}>
 		<div class="form-group">
 			<label for="phone">Phone Number</label>
-			<input id="phone" type="tel" bind:value={phoneNumber} placeholder="254708374149" required />
+			<input id="phone" type="tel" bind:value={phoneNumber} placeholder="254712345678" required />
 		</div>
 
 		<div class="form-group">

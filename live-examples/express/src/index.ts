@@ -35,6 +35,47 @@ app.use((err, res) => {
     error: err.message || "Internal server error",
   });
 });
+app.post("/stk-push", async (req, res) => {
+  try {
+    const { amount, phone } = req.body;
+
+    console.log("Request received:", { amount, phone });
+
+    const response = await mpesa.stkPush({
+      amount,
+      phoneNumber: phone,
+      accountReference: "TEST-001",
+      transactionDesc: "Test payment",
+    });
+
+    console.log("M-Pesa response:", response);
+
+    res.status(200).json({
+      success: true,
+      data: response,
+    });
+  } catch (error) {
+    // Log different parts of the error
+    console.error("Error occurred:");
+    console.error("Status Code:", error.statusCode);
+    console.error("Status Message:", error.statusMessage);
+
+    // Try to read the response body
+    let errorBody = "";
+    error.on("data", (chunk) => {
+      errorBody += chunk;
+    });
+
+    error.on("end", () => {
+      console.error("Error body:", errorBody);
+
+      res.status(500).json({
+        success: false,
+        error: errorBody || error.message || "M-Pesa request failed",
+      });
+    });
+  }
+});
 
 app.listen(3001, () => {
   console.log("Server running on port 3001");

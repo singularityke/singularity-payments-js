@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function PaymentTest() {
   const [amount, setAmount] = useState(1);
-  const [phoneNumber, setPhoneNumber] = useState("254708374149"); // This is the test phone number replace with your phone number
+  const [phoneNumber, setPhoneNumber] = useState("254712345678"); // This is the test phone number replace with your phone number
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const { data, error } = await mpesaClient.stkPush({

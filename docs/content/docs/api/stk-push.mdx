@@ -1,0 +1,525 @@
+---
+title: STK Push
+description: Accept payments from customers using M-Pesa STK Push
+---
+
+## Overview
+
+STK Push allows you to initiate payment requests directly to your customers' phones. The customer receives a prompt on their phone to enter their M-Pesa PIN and authorize the payment.
+
+## How It Works
+
+1. **Initiate Payment**: Your application sends an STK Push request to M-Pesa
+2. **Customer Receives Prompt**: Customer gets a payment prompt on their phone
+3. **Customer Authorizes**: Customer enters their M-Pesa PIN to complete payment
+4. **Receive Callback**: M-Pesa sends the transaction result to your callback URL
+5. **Process Result**: Your application processes the payment confirmation
+
+### Client Side
+
+Client side is basically the same but under the hood the SDK handles calling the endpoint on the backend. If you are doing a simple donation form this is fine but we recommend the server side methods, you will see why below.
+
+```typescript
+const response = await mpesaClient.stkPush({
+  amount: 100,
+  phoneNumber: "254712345678",
+  accountReference: "INV-001",
+  transactionDesc: "Payment for Order #001",
+});
+```
+
+### Server-Side
+
+Quite a simple illustration
+
+```typescript
+const response = await mpesa.client.stkPush({
+  amount: 100,
+  phoneNumber: "254712345678",
+  accountReference: "INV-001",
+  transactionDesc: "Payment for Order #001",
+});
+```
+
+The Response is going to look like this if it is successful
+
+```json
+{
+  "success": true,
+  "data": {
+    "MerchantRequestID": "9e2d-4d13-b15f-cbf9a0b7e00f10096",
+    "CheckoutRequestID": "ws_CO_31122025161014683740185793",
+    "ResponseCode": "0",
+    "ResponseDescription": "Success. Request accepted for processing",
+    "CustomerMessage": "Success. Request accepted for processing"
+  }
+}
+```
+
+In a real app you may want to use a database to store the transaction details and update them as the payment status changes and also get the amount from the database using a product id of some sort.
+
+Here in my example I will receive a product id to ensure the amount is correct, save the checkout request id to ensure the transaction is unique, and store the product id in the database.
+
+```typescript
+import { db } from "./db";
+import { payments, products } from "./schema";
+import { eq } from "drizzle-orm";
+import { mpesa } from "@/lib/mpesa";
+
+interface CheckoutRequest {
+  productId: string;
+  phoneNumber: string;
+}
+
+async function initiateCheckout(request: CheckoutRequest) {
+  const { productId, phoneNumber } = request;
+
+  try {
+    // 1. Get the product and amount from the database
+    const product = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, productId))
+      .limit(1);
+
+    if (product.length === 0) {
+      throw new Error("Product not found");
+    }
+
+    const amount = product[0].price;
+
+    // 2. Initiate M-Pesa STK Push
+    const response = await mpesa.client.stkPush({
+      amount: Number(amount),
+      phoneNumber,
+      accountReference: `ORDER-${productId}`,
+      transactionDesc: `Payment for ${product[0].name}`,
+    });
+
+    // 3. Store the payment with pending status
+    await db.insert(payments).values({
+      checkoutRequestId: response.CheckoutRequestID,
+      merchantRequestId: response.MerchantRequestID,
+      productId,
+      phoneNumber,
+      amount,
+      status: "pending",
+      createdAt: new Date(),
+    });
+
+    return {
+      success: true,
+      checkoutRequestId: response.CheckoutRequestID,
+      message: response.CustomerMessage,
+    };
+  } catch (error) {
+    console.error("Checkout failed:", error);
+    throw error;
+  }
+}
+```
+
+Then in the callback options we can update based on the CheckoutRequestID to show whether the order was successful or failed
+
+```typescript
+callbackOptions = {
+  onSuccess: async (data) => {
+    console.log("Payment successful:", {
+      amount: data.amount,
+      phone: data.phoneNumber,
+      receipt: data.mpesaReceiptNumber,
+      transactionDate: data.transactionDate,
+    });
+
+    await db
+      .update(payments)
+      .set({
+        status: "completed",
+        mpesaReceiptNumber: data.mpesaReceiptNumber,
+        transactionDate: new Date(data.transactionDate),
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.checkoutRequestId, data.checkoutRequestId));
+  },
+
+  onFailure: async (data) => {
+    console.log("Payment failed:", {
+      resultCode: data.resultCode,
+      resultDesc: data.resultDescription,
+    });
+
+    await db
+      .update(payments)
+      .set({
+        status: "failed",
+        resultCode: data.resultCode,
+        resultDescription: data.resultDescription,
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.checkoutRequestId, data.checkoutRequestId));
+  },
+};
+```
+
+## API Reference
+
+### STK Push Request
+
+```typescript
+interface STKPushRequest {
+  amount: number; // Amount in KES (minimum 1)
+  phoneNumber: string; // Format: 254XXXXXXXXX
+  accountReference: string; // Max 13 characters
+  transactionDesc: string; // Transaction description
+  callbackUrl?: string; // Optional: Override default callback URL
+}
+```
+
+#### Parameters
+
+| Parameter          | Type   | Required | Description                                                                       |
+| ------------------ | ------ | -------- | --------------------------------------------------------------------------------- |
+| `amount`           | number | Yes      | Payment amount in KES. Minimum: 1                                                 |
+| `phoneNumber`      | string | Yes      | Customer's phone number. Format: `254XXXXXXXXX`                                   |
+| `accountReference` | string | Yes      | Reference for the transaction (invoice number, order ID, etc.). Max 13 characters |
+| `transactionDesc`  | string | Yes      | Description                                                                       |
+| `callbackUrl`      | string | No       | Override the default callback URL for this transaction                            |
+
+The SDK automatically formats phone numbers, but the recommended format is:
+
+```typescript
+// ✅ Recommended formats
+"254712345678"; // With country code
+"0712345678"; // Will be converted to 254712345678
+"712345678"; // Will be converted to 254712345678
+"+254712345678"; // Will be converted to 254712345678
+
+// ❌ Invalid formats
+"+254 712 345 678"; // Will be cleaned but avoid spaces
+"712-345-678"; // Will be cleaned but avoid dashes
+```
+
+### STK Push Response
+
+```typescript
+interface STKPushResponse {
+  MerchantRequestID: string; // Unique request ID
+  CheckoutRequestID: string; // Use this to query transaction status
+  ResponseCode: string; // "0" = success
+  ResponseDescription: string; // Human-readable response
+  CustomerMessage: string; // Message shown to customer
+}
+```
+
+#### Response Codes
+
+| Code           | Description               | Action                            |
+| -------------- | ------------------------- | --------------------------------- |
+| `0`            | Success. Request accepted | Wait for callback or query status |
+| `1`            | Rejected                  | Check error message and retry     |
+| `500.001.1001` | Invalid credentials       | Verify consumer key/secret        |
+| `400.002.02`   | Invalid phone number      | Check phone number format         |
+
+### Server-Side
+
+```typescript
+const status = await mpesa.client.stkQuery({
+  CheckoutRequestID: "ws_CO_191220191020363925",
+});
+console.log(status);
+
+// {
+//   ResponseCode: "0",
+//   ResponseDescription: "The service request has been accepted successfully",
+//   MerchantRequestID: "29115-34620561-1",
+//   CheckoutRequestID: "ws_CO_191220191020363925",
+//   ResultCode: "0",  // "0" = successful payment
+//   ResultDesc: "The service request is processed successfully."
+// }
+```
+
+### Client-Side
+
+```typescript
+const { data, error } = await mpesaClient.stkQuery({
+  CheckoutRequestID: "ws_CO_191220191020363925",
+});
+
+if (data?.ResultCode === "0") {
+  console.log("Payment successful!");
+} else {
+  console.log("Payment failed:", data?.ResultDesc);
+}
+```
+
+### Query Response
+
+```typescript
+interface TransactionStatusResponse {
+  ResponseCode: string;
+  ResponseDescription: string;
+  MerchantRequestID: string;
+  CheckoutRequestID: string;
+  ResultCode: string; // Transaction result
+  ResultDesc: string; // Transaction result description
+}
+```
+
+#### Result Codes
+
+| Code   | Description        | Meaning                              |
+| ------ | ------------------ | ------------------------------------ |
+| `0`    | Success            | Payment completed successfully       |
+| `1`    | Insufficient funds | Customer doesn't have enough balance |
+| `17`   | User cancelled     | Customer cancelled the transaction   |
+| `1032` | Request cancelled  | Customer cancelled the prompt        |
+| `1037` | Timeout            | Customer didn't respond in time      |
+| `2001` | Wrong PIN          | Customer entered wrong PIN           |
+
+## Handling Callbacks
+
+The default configuration already handles callbacks using a catch all route
+
+<Card title="B2B Payments" href="/integrations">
+  Default configuration already handles callbacks
+</Card>
+
+All M-Pesa integrations require these core credentials:
+
+### Process Callbacks in Your Application
+
+```typescript
+import { MpesaClient } from "@singularity-payments/nextjs"; // change to the framework you are using
+
+const mpesa = new MpesaClient(
+  {
+    // ... your config
+  },
+  {
+    callbackOptions: {
+      // Called when payment succeeds
+      onSuccess: async (data) => {
+        console.log("Payment successful:", {
+          amount: data.amount,
+          mpesaReceiptNumber: data.mpesaReceiptNumber,
+          phoneNumber: data.phoneNumber,
+          transactionDate: data.transactionDate,
+        });
+
+        // Update your database
+        await db.orders.update({
+          where: { checkoutRequestId: data.CheckoutRequestID },
+          data: {
+            status: "paid",
+            mpesaReceipt: data.mpesaReceiptNumber,
+            paidAt: new Date(data.transactionDate!),
+          },
+        });
+
+        // Send confirmation email
+        await sendConfirmationEmail(data);
+      },
+
+      // Called when payment fails
+      onFailure: async (data) => {
+        console.log("Payment failed:", {
+          reason: data.errorMessage,
+          resultCode: data.resultCode,
+        });
+
+        // Update your database
+        await db.orders.update({
+          where: { checkoutRequestId: data.CheckoutRequestID },
+          data: {
+            status: "failed",
+            failureReason: data.errorMessage,
+          },
+        });
+      },
+
+      // Validate IP (recommended for production)
+      validateIp: true,
+
+      // Prevent duplicate processing
+      isDuplicate: async (checkoutRequestId) => {
+        const existing = await db.transactions.findUnique({
+          where: { checkoutRequestId },
+        });
+        return !!existing;
+      },
+    },
+  },
+);
+```
+
+### Callback Data Structure
+
+```typescript
+interface ParsedCallbackData {
+  merchantRequestId: string;
+  CheckoutRequestID: string;
+  resultCode: number;
+  resultDescription: string;
+  amount?: number; // Only present on success
+  mpesaReceiptNumber?: string; // Only present on success
+  transactionDate?: string; // Only present on success (ISO format)
+  phoneNumber?: string; // Only present on success
+  isSuccess: boolean;
+  errorMessage?: string; // Only present on failure
+}
+```
+
+## Best Practices
+
+### 1. Store CheckoutRequestID
+
+Always store the `CheckoutRequestID` to track payment status:
+
+```typescript
+const response = await mpesa.stkPush({
+  /* ... */
+});
+
+// Save to database
+await db.payment.create({
+  data: {
+    checkoutRequestId: response.CheckoutRequestID,
+    status: "PENDING",
+    // ... other fields
+  },
+});
+```
+
+### 2. Implement Duplicate Prevention
+
+Prevent processing the same callback twice:
+
+```typescript
+callbackOptions: {
+  isDuplicate: async (checkoutRequestId) => {
+    const payment = await db.payment.findUnique({
+      where: { checkoutRequestId },
+    });
+    return payment?.status === "SUCCESS";
+  },
+}
+```
+
+### 3. Validate Callback IP
+
+Always validate that callbacks are from Safaricom:
+
+```typescript
+callbackOptions: {
+  validateIp: true, // Enable IP validation
+}
+```
+
+### 4. Handle All Result Codes
+
+Handle different payment outcomes:
+
+```typescript
+callbackOptions: {
+  onFailure: async (data) => {
+    switch (data.resultCode) {
+      case 1:
+        // Insufficient funds
+        await notifyCustomer("Insufficient M-Pesa balance");
+        break;
+      case 17:
+      case 1032:
+        // User cancelled
+        await notifyCustomer("Payment cancelled");
+        break;
+      case 1037:
+        // Timeout
+        await notifyCustomer("Payment timeout");
+        break;
+      default:
+        await notifyCustomer("Payment failed");
+    }
+  },
+}
+```
+
+## Troubleshooting
+
+### "Invalid Access Token"
+
+**Cause**: Consumer key/secret incorrect or expired
+
+**Solution**:
+
+```bash
+# Verify credentials
+echo $MPESA_CONSUMER_KEY
+echo $MPESA_CONSUMER_SECRET
+
+# Regenerate from developer portal if needed
+```
+
+### "Invalid ShortCode"
+
+**Cause**: Incorrect shortcode for environment
+
+**Solution**:
+
+```typescript
+// Sandbox
+shortcode: "174379";
+
+// Production
+shortcode: "YOUR_PAYBILL_NUMBER";
+```
+
+### Callback Not Received
+
+**Causes**:
+
+1. Callback URL not publicly accessible
+2. Firewall blocking Safaricom IPs
+3. Route not properly configured
+
+**Solutions**:
+
+```bash
+# 1. Use ngrok for local development
+ngrok http 3000
+
+# 2. Verify route exists
+# app/api/mpesa/callback/route.ts  This depends on the framework
+
+# 3. Check Safaricom IPs are allowed
+# 196.201.214.200, 196.201.214.206, etc.
+```
+
+### "DS timeout user cannot be reached"
+
+**Cause**: Phone number not reachable or invalid
+
+**Solution**:
+
+- Verify phone number is correct
+- Ensure phone is on and has network
+- Check phone number is registered with M-Pesa
+
+## Next Steps
+
+<Cards>
+  <Card title="Callbacks" href="/api-reference/callbacks">
+    Learn how to handle M-Pesa callbacks
+  </Card>
+
+<Card title="Transaction Status" href="/api-reference/transaction-status">
+  Query payment status
+</Card>
+
+<Card title="Error Handling" href="/api-reference/error-handling">
+  Handle errors and edge cases
+</Card>
+
+  <Card title="C2B Payments" href="/api-reference/c2b">
+    Accept payments initiated by customers
+  </Card>
+</Cards>

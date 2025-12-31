@@ -9,7 +9,7 @@
           id="phone"
           v-model="phoneNumber"
           type="tel"
-          placeholder="254708374149"
+          placeholder="254712345678"
           required
         />
       </div>
@@ -40,7 +40,7 @@ import { useMpesa } from "../composables/useMpesa";
 const { mpesaClient } = useMpesa();
 
 const amount = ref(1);
-const phoneNumber = ref("254708374149");
+const phoneNumber = ref("254712345678");
 const loading = ref(false);
 const response = ref(null);
 const error = ref(null);
