@@ -1,17 +1,19 @@
 {
   "title": "API Reference",
   "icon": "Network",
-  "index": "Overview",
-  "configuration": "Configuration",
-  "stk-push": "STK Push",
-  "c2b": "C2B Payments",
-  "b2c": "B2C Payments",
-  "b2b": "B2B Payments",
-  "transaction-status": "Transaction Status",
-  "account-balance": "Account Balance",
-  "reversal": "Reversals",
-  "dynamic-qr": "Dynamic QR Code",
-  "callbacks": "Callbacks & Webhooks",
-  "error-handling": "Error Handling",
-  "rate-limiting": "Rate Limiting"
+  "pages": [
+    "overview",
+    "configuration",
+    "stk-push",
+    "c2b",
+    "b2c",
+    "b2b",
+    "transaction-status",
+    "account-balance",
+    "reversal",
+    "dynamic-qr",
+    "callbacks",
+    "error-handling",
+    "rate-limiting"
+  ]
 }
