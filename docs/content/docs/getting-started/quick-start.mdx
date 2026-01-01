@@ -457,7 +457,7 @@ methods: ["GET", "POST", "OPTIONS"],
 )
 .get("/", () => "M-Pesa Payment API")
 .get("/health", () => ({ status: "ok" }))
-.group("/api", (app) => app.use(mpesa.app))
+.group("/api/mpesa", (app) => app.use(mpesa.app))
 .listen(3004);
 
 console.log("Registered routes:");
