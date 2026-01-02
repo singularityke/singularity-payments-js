@@ -69,13 +69,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     b2cResult: async (ctx: Context) => {
       try {
         const body = ctx.body as B2CCallback;
-        const parsed = client.getCallbackHandler().parseB2CCallback(body);
-        console.log("B2C Result:", parsed);
+        const response = await client.handleB2CCallback(body);
         ctx.set.status = 200;
-        return {
-          ResultCode: 0,
-          ResultDesc: "Accepted",
-        };
+        return response;
       } catch (error: any) {
         console.error("B2C Result error:", error);
         ctx.set.status = 200;
@@ -108,13 +104,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     b2bResult: async (ctx: Context) => {
       try {
         const body = ctx.body as B2BCallback;
-        const parsed = client.getCallbackHandler().parseB2BCallback(body);
-        console.log("B2B Result:", parsed);
+        const response = await client.handleB2BCallback(body);
         ctx.set.status = 200;
-        return {
-          ResultCode: 0,
-          ResultDesc: "Accepted",
-        };
+        return response;
       } catch (error: any) {
         console.error("B2B Result error:", error);
         ctx.set.status = 200;
@@ -147,15 +139,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     balanceResult: async (ctx: Context) => {
       try {
         const body = ctx.body as AccountBalanceCallback;
-        const parsed = client
-          .getCallbackHandler()
-          .parseAccountBalanceCallback(body);
-        console.log("Balance Result:", parsed);
+        const response = await client.handleAccountBalanceCallback(body);
         ctx.set.status = 200;
-        return {
-          ResultCode: 0,
-          ResultDesc: "Accepted",
-        };
+        return response;
       } catch (error: any) {
         console.error("Balance Result error:", error);
         ctx.set.status = 200;
@@ -188,13 +174,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     reversalResult: async (ctx: Context) => {
       try {
         const body = ctx.body as ReversalCallback;
-        const parsed = client.getCallbackHandler().parseReversalCallback(body);
-        console.log("Reversal Result:", parsed);
+        const response = await client.handleReversalCallback(body);
         ctx.set.status = 200;
-        return {
-          ResultCode: 0,
-          ResultDesc: "Accepted",
-        };
+        return response;
       } catch (error: any) {
         console.error("Reversal Result error:", error);
         ctx.set.status = 200;
@@ -227,15 +209,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     statusResult: async (ctx: Context) => {
       try {
         const body = ctx.body as TransactionStatusCallback;
-        const parsed = client
-          .getCallbackHandler()
-          .parseTransactionStatusCallback(body);
-        console.log("Status Result:", parsed);
+        const response = await client.handleTransactionStatusCallback(body);
         ctx.set.status = 200;
-        return {
-          ResultCode: 0,
-          ResultDesc: "Accepted",
-        };
+        return response;
       } catch (error: any) {
         console.error("Status Result error:", error);
         ctx.set.status = 200;

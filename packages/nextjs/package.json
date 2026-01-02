@@ -1,6 +1,6 @@
 {
   "name": "@singularity-payments/nextjs",
-  "version": "0.1.0-alpha.4",
+  "version": "1.0.0-alpha.1",
   "publishConfig": {
     "access": "public"
   },

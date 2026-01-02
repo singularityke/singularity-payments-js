@@ -41,6 +41,44 @@ export interface CallbackHandlerOptions {
   onCallback?: (data: ParsedCallbackData) => void | Promise<void>;
   onC2BConfirmation?: (data: ParsedC2BCallback) => void | Promise<void>;
   onC2BValidation?: (data: ParsedC2BCallback) => Promise<boolean>;
+  onB2CResult?: (data: {
+    isSuccess: boolean;
+    transactionId?: string;
+    amount?: number;
+    recipientPhone?: string;
+    charges?: number;
+    errorMessage?: string;
+  }) => void | Promise<void>;
+
+  onB2BResult?: (data: {
+    isSuccess: boolean;
+    transactionId?: string;
+    amount?: number;
+    errorMessage?: string;
+  }) => void | Promise<void>;
+
+  onAccountBalance?: (data: {
+    isSuccess: boolean;
+    workingBalance?: number;
+    availableBalance?: number;
+    bookedBalance?: number;
+    errorMessage?: string;
+  }) => void | Promise<void>;
+
+  onTransactionStatus?: (data: {
+    isSuccess: boolean;
+    receiptNo?: string;
+    amount?: number;
+    completedTime?: string;
+    originatorConversationId?: string;
+    errorMessage?: string;
+  }) => void | Promise<void>;
+
+  onReversal?: (data: {
+    isSuccess: boolean;
+    transactionId?: string;
+    errorMessage?: string;
+  }) => void | Promise<void>;
   validateIp?: boolean;
   allowedIps?: string[];
   isDuplicate?: (CheckoutRequestID: string) => boolean | Promise<boolean>;

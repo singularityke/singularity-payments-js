@@ -99,17 +99,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
       POST: async (event: RequestEvent) => {
         try {
           const body = (await event.request.json()) as B2CCallback;
-          const parsed = client.getCallbackHandler().parseB2CCallback(body);
-
-          console.log("B2C Result:", parsed);
-
-          return json(
-            {
-              ResultCode: 0,
-              ResultDesc: "Accepted",
-            },
-            { status: 200 },
-          );
+          const response = await client.handleB2CCallback(body);
+          return json(response, { status: 200 });
         } catch (error: any) {
           console.error("B2C Result error:", error);
           return json(
@@ -142,6 +133,219 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
           );
         } catch (error: any) {
           console.error("B2C Timeout error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * B2B result handler
+     * Handles callbacks from M-Pesa after B2B requests
+     */
+    b2bResult: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = (await event.request.json()) as B2BCallback;
+          const response = await client.handleB2BCallback(body);
+          return json(response, { status: 200 });
+        } catch (error: any) {
+          console.error("B2B Result error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * B2B timeout handler
+     * Handles timeout notifications from M-Pesa for B2B requests
+     */
+    b2bTimeout: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = await event.request.json();
+          console.log("B2B Timeout:", body);
+
+          return json(
+            {
+              ResultCode: 0,
+              ResultDesc: "Timeout received",
+            },
+            { status: 200 },
+          );
+        } catch (error: any) {
+          console.error("B2B Timeout error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * Account Balance result handler
+     * Handles callbacks from M-Pesa after account balance requests
+     */
+    balanceResult: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = (await event.request.json()) as AccountBalanceCallback;
+          const response = await client.handleAccountBalanceCallback(body);
+          return json(response, { status: 200 });
+        } catch (error: any) {
+          console.error("Balance Result error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * Account Balance timeout handler
+     * Handles timeout notifications from M-Pesa for account balance requests
+     */
+    balanceTimeout: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = await event.request.json();
+          console.log("Balance Timeout:", body);
+
+          return json(
+            {
+              ResultCode: 0,
+              ResultDesc: "Timeout received",
+            },
+            { status: 200 },
+          );
+        } catch (error: any) {
+          console.error("Balance Timeout error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * Transaction Status result handler
+     * Handles callbacks from M-Pesa after transaction status requests
+     */
+    transactionStatusResult: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body =
+            (await event.request.json()) as TransactionStatusCallback;
+          const response = await client.handleTransactionStatusCallback(body);
+          return json(response, { status: 200 });
+        } catch (error: any) {
+          console.error("Transaction Status Result error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * Transaction Status timeout handler
+     * Handles timeout notifications from M-Pesa for transaction status requests
+     */
+    transactionStatusTimeout: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = await event.request.json();
+          console.log("Transaction Status Timeout:", body);
+
+          return json(
+            {
+              ResultCode: 0,
+              ResultDesc: "Timeout received",
+            },
+            { status: 200 },
+          );
+        } catch (error: any) {
+          console.error("Transaction Status Timeout error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * Reversal result handler
+     * Handles callbacks from M-Pesa after reversal requests
+     */
+    reversalResult: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = (await event.request.json()) as ReversalCallback;
+          const response = await client.handleReversalCallback(body);
+          return json(response, { status: 200 });
+        } catch (error: any) {
+          console.error("Reversal Result error:", error);
+          return json(
+            {
+              ResultCode: 1,
+              ResultDesc: "Processing failed",
+            },
+            { status: 200 },
+          );
+        }
+      },
+    },
+
+    /**
+     * Reversal timeout handler
+     * Handles timeout notifications from M-Pesa for reversal requests
+     */
+    reversalTimeout: {
+      POST: async (event: RequestEvent) => {
+        try {
+          const body = await event.request.json();
+          console.log("Reversal Timeout:", body);
+
+          return json(
+            {
+              ResultCode: 0,
+              ResultDesc: "Timeout received",
+            },
+            { status: 200 },
+          );
+        } catch (error: any) {
+          console.error("Reversal Timeout error:", error);
           return json(
             {
               ResultCode: 1,
@@ -228,77 +432,38 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
 
           // B2B callbacks
           if (lastSegment === "b2b-result") {
-            const body = (await event.request.json()) as B2BCallback;
-            const parsed = client.getCallbackHandler().parseB2BCallback(body);
-            console.log("B2B Result:", parsed);
-            return json({ ResultCode: 0, ResultDesc: "Accepted" });
+            return handlers.b2bResult.POST(event);
           }
 
           if (lastSegment === "b2b-timeout") {
-            const body = await event.request.json();
-            console.log("B2B Timeout:", body);
-            return json({
-              ResultCode: 0,
-              ResultDesc: "Timeout received",
-            });
+            return handlers.b2bTimeout.POST(event);
           }
 
           // Account balance callbacks
           if (lastSegment === "balance-result") {
-            const body = (await event.request.json()) as AccountBalanceCallback;
-            const parsed = client
-              .getCallbackHandler()
-              .parseAccountBalanceCallback(body);
-            console.log("Balance Result:", parsed);
-            return json({ ResultCode: 0, ResultDesc: "Accepted" });
+            return handlers.balanceResult.POST(event);
           }
 
           if (lastSegment === "balance-timeout") {
-            const body = await event.request.json();
-            console.log("Balance Timeout:", body);
-            return json({
-              ResultCode: 0,
-              ResultDesc: "Timeout received",
-            });
+            return handlers.balanceTimeout.POST(event);
           }
 
           // Transaction status callbacks
           if (lastSegment === "status-result") {
-            const body =
-              (await event.request.json()) as TransactionStatusCallback;
-            const parsed = client
-              .getCallbackHandler()
-              .parseTransactionStatusCallback(body);
-            console.log("Status Result:", parsed);
-            return json({ ResultCode: 0, ResultDesc: "Accepted" });
+            return handlers.transactionStatusResult.POST(event);
           }
 
           if (lastSegment === "status-timeout") {
-            const body = await event.request.json();
-            console.log("Status Timeout:", body);
-            return json({
-              ResultCode: 0,
-              ResultDesc: "Timeout received",
-            });
+            return handlers.transactionStatusTimeout.POST(event);
           }
 
           // Reversal callbacks
           if (lastSegment === "reversal-result") {
-            const body = (await event.request.json()) as ReversalCallback;
-            const parsed = client
-              .getCallbackHandler()
-              .parseReversalCallback(body);
-            console.log("Reversal Result:", parsed);
-            return json({ ResultCode: 0, ResultDesc: "Accepted" });
+            return handlers.reversalResult.POST(event);
           }
 
           if (lastSegment === "reversal-timeout") {
-            const body = await event.request.json();
-            console.log("Reversal Timeout:", body);
-            return json({
-              ResultCode: 0,
-              ResultDesc: "Timeout received",
-            });
+            return handlers.reversalTimeout.POST(event);
           }
 
           // CLIENT API HANDLERS (FROM THE FRONTEND)
@@ -428,15 +593,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
               resultUrl,
               timeoutUrl,
             } = body;
-            console.log("B2B Request Parameters:", {
-              amount,
-              partyB,
-              commandID,
-              senderIdentifierType,
-              receiverIdentifierType,
-              accountReference,
-              remarks,
-            });
 
             if (!amount || !partyB || !commandID || !accountReference) {
               return json(
@@ -459,7 +615,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
               resultUrl,
               timeoutUrl,
             });
-            console.log("B2B Response:", response);
 
             return json(response);
           }

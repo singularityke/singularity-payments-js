@@ -72,15 +72,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     b2cResult: async (c: Context) => {
       try {
         const body = await c.req.json<B2CCallback>();
-        const parsed = client.getCallbackHandler().parseB2CCallback(body);
-        console.log("B2C Result:", parsed);
-        return c.json(
-          {
-            ResultCode: 0,
-            ResultDesc: "Accepted",
-          },
-          200,
-        );
+        const response = await client.handleB2CCallback(body);
+        return c.json(response, 200);
       } catch (error: any) {
         console.error("B2C Result error:", error);
         return c.json(
@@ -119,15 +112,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     b2bResult: async (c: Context) => {
       try {
         const body = await c.req.json<B2BCallback>();
-        const parsed = client.getCallbackHandler().parseB2BCallback(body);
-        console.log("B2B Result:", parsed);
-        return c.json(
-          {
-            ResultCode: 0,
-            ResultDesc: "Accepted",
-          },
-          200,
-        );
+        const response = await client.handleB2BCallback(body);
+        return c.json(response, 200);
       } catch (error: any) {
         console.error("B2B Result error:", error);
         return c.json(
@@ -166,17 +152,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     balanceResult: async (c: Context) => {
       try {
         const body = await c.req.json<AccountBalanceCallback>();
-        const parsed = client
-          .getCallbackHandler()
-          .parseAccountBalanceCallback(body);
-        console.log("Balance Result:", parsed);
-        return c.json(
-          {
-            ResultCode: 0,
-            ResultDesc: "Accepted",
-          },
-          200,
-        );
+        const response = await client.handleAccountBalanceCallback(body);
+        return c.json(response, 200);
       } catch (error: any) {
         console.error("Balance Result error:", error);
         return c.json(
@@ -215,15 +192,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     reversalResult: async (c: Context) => {
       try {
         const body = await c.req.json<ReversalCallback>();
-        const parsed = client.getCallbackHandler().parseReversalCallback(body);
-        console.log("Reversal Result:", parsed);
-        return c.json(
-          {
-            ResultCode: 0,
-            ResultDesc: "Accepted",
-          },
-          200,
-        );
+        const response = await client.handleReversalCallback(body);
+        return c.json(response, 200);
       } catch (error: any) {
         console.error("Reversal Result error:", error);
         return c.json(
@@ -262,17 +232,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     statusResult: async (c: Context) => {
       try {
         const body = await c.req.json<TransactionStatusCallback>();
-        const parsed = client
-          .getCallbackHandler()
-          .parseTransactionStatusCallback(body);
-        console.log("Status Result:", parsed);
-        return c.json(
-          {
-            ResultCode: 0,
-            ResultDesc: "Accepted",
-          },
-          200,
-        );
+        const response = await client.handleTransactionStatusCallback(body);
+        return c.json(response, 200);
       } catch (error: any) {
         console.error("Status Result error:", error);
         return c.json(
@@ -405,16 +366,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
           timeoutUrl,
         } = await c.req.json();
 
-        console.log("B2B Request Parameters:", {
-          amount,
-          partyB,
-          commandID,
-          senderIdentifierType,
-          receiverIdentifierType,
-          accountReference,
-          remarks,
-        });
-
         if (!amount || !partyB || !commandID || !accountReference) {
           return c.json(
             {
@@ -437,7 +388,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
           timeoutUrl,
         });
 
-        console.log("B2B Response:", response);
         return c.json(response);
       } catch (error: any) {
         console.error("B2B error:", error);
@@ -543,7 +493,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
             {
               error:
                 "Merchant name, reference number, amount, transaction type, and credit party identifier are required",
-              received: await c.req.json(),
             },
             400,
           );

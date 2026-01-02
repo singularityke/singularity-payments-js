@@ -13,12 +13,12 @@ export type {
 } from "@singularity-payments/core";
 
 /**
- * Create M-Pesa instance for SvelteKit
+ * Create M-Pesa instance for Nuxt
  *
  * @example
  * ```typescript
- * // lib/mpesa.ts
- * import { createMpesa } from "@singularity-payments/sveltekit";
+ * // utils/mpesa.ts
+ * import { createMpesa } from "@singularity-payments/nuxt";
  *
  * export const mpesa = createMpesa({
  *   consumerKey: process.env.MPESA_CONSUMER_KEY!,
@@ -26,7 +26,7 @@ export type {
  *   passkey: process.env.MPESA_PASSKEY!,
  *   shortcode: process.env.MPESA_SHORTCODE!,
  *   environment: "sandbox",
- *   callbackUrl: `${process.env.PUBLIC_APP_URL}/api/mpesa/callback`
+ *   callbackUrl: `${process.env.NUXT_PUBLIC_APP_URL}/api/mpesa/callback`
  * }, {
  *   callbackOptions: {
  *     onSuccess: async (data) => {
@@ -42,31 +42,22 @@ export type {
  *
  * @example
  * ```typescript
- * // src/routes/api/mpesa/callback/+server.ts
- * import { mpesa } from "$lib/mpesa";
+ * // server/api/mpesa/[...mpesa].ts
+ * import { mpesa } from "~/utils/mpesa";
  *
- * export const POST = mpesa.handlers.stkCallback.POST;
- * ```
- *
- * @example
- * ```typescript
- * // src/routes/api/mpesa/[...path]/+server.ts - Catch-all route
- * import { mpesa } from "$lib/mpesa";
- *
- * export const POST = mpesa.handlers.catchAll.POST;
+ * export default mpesa.handlers.catchAll;
  * ```
  */
 export function createMpesa(config: MpesaConfig, options?: MpesaClientOptions) {
   const client = new MpesaClient(config, options);
   const handlers = createMpesaHandlers(client);
-
   return {
     /**
      * M-Pesa client instance for making API calls
      */
     client,
     /**
-     * Pre-configured SvelteKit route handlers for M-Pesa callbacks
+     * Pre-configured Nuxt event handlers for M-Pesa callbacks
      */
     handlers,
   };
@@ -83,8 +74,26 @@ export {
   type TransactionStatusResponse,
   type C2BRegisterRequest,
   type C2BRegisterResponse,
+  type B2CRequest,
+  type B2CResponse,
+  type B2BRequest,
+  type B2BResponse,
+  type AccountBalanceRequest,
+  type AccountBalanceResponse,
+  type GeneralTransactionStatusRequest,
+  type GeneralTransactionStatusResponse,
+  type ReversalRequest,
+  type ReversalResponse,
+  type DynamicQRRequest,
+  type DynamicQRResponse,
   type STKCallback,
   type C2BCallback,
+  type B2CCallback,
+  type B2BCallback,
+  type AccountBalanceCallback,
+  type TransactionStatusCallback,
+  type ReversalCallback,
   type ParsedCallbackData,
   type ParsedC2BCallback,
+  type CallbackHandlerOptions,
 } from "@singularity-payments/core";

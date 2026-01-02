@@ -88,14 +88,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
     b2cResult: defineEventHandler(async (event) => {
       try {
         const body = await readBody<B2CCallback>(event);
-        const parsed = client.getCallbackHandler().parseB2CCallback(body);
-
-        console.log("B2C Result:", parsed);
-
-        return {
-          ResultCode: 0,
-          ResultDesc: "Accepted",
-        };
+        const response = await client.handleB2CCallback(body);
+        return response;
       } catch (error: any) {
         console.error("B2C Result error:", error);
         return {
@@ -200,9 +194,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         // B2C callbacks
         if (lastSegment === "b2c-result") {
           const body = await readBody<B2CCallback>(event);
-          const parsed = client.getCallbackHandler().parseB2CCallback(body);
-          console.log("B2C Result:", parsed);
-          return { ResultCode: 0, ResultDesc: "Accepted" };
+          const response = await client.handleB2CCallback(body);
+          return response;
         }
 
         if (lastSegment === "b2c-timeout") {
@@ -214,9 +207,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         // B2B callbacks
         if (lastSegment === "b2b-result") {
           const body = await readBody<B2BCallback>(event);
-          const parsed = client.getCallbackHandler().parseB2BCallback(body);
-          console.log("B2B Result:", parsed);
-          return { ResultCode: 0, ResultDesc: "Accepted" };
+          const response = await client.handleB2BCallback(body);
+          return response;
         }
 
         if (lastSegment === "b2b-timeout") {
@@ -228,11 +220,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         // Account balance callbacks
         if (lastSegment === "balance-result") {
           const body = await readBody<AccountBalanceCallback>(event);
-          const parsed = client
-            .getCallbackHandler()
-            .parseAccountBalanceCallback(body);
-          console.log("Balance Result:", parsed);
-          return { ResultCode: 0, ResultDesc: "Accepted" };
+          const response = await client.handleAccountBalanceCallback(body);
+          return response;
         }
 
         if (lastSegment === "balance-timeout") {
@@ -244,11 +233,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         // Transaction status callbacks
         if (lastSegment === "status-result") {
           const body = await readBody<TransactionStatusCallback>(event);
-          const parsed = client
-            .getCallbackHandler()
-            .parseTransactionStatusCallback(body);
-          console.log("Status Result:", parsed);
-          return { ResultCode: 0, ResultDesc: "Accepted" };
+          const response = await client.handleTransactionStatusCallback(body);
+          return response;
         }
 
         if (lastSegment === "status-timeout") {
@@ -260,11 +246,8 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         // Reversal callbacks
         if (lastSegment === "reversal-result") {
           const body = await readBody<ReversalCallback>(event);
-          const parsed = client
-            .getCallbackHandler()
-            .parseReversalCallback(body);
-          console.log("Reversal Result:", parsed);
-          return { ResultCode: 0, ResultDesc: "Accepted" };
+          const response = await client.handleReversalCallback(body);
+          return response;
         }
 
         if (lastSegment === "reversal-timeout") {
@@ -399,16 +382,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
             timeoutUrl,
           } = body;
 
-          console.log("B2B Request Parameters:", {
-            amount,
-            partyB,
-            commandID,
-            senderIdentifierType,
-            receiverIdentifierType,
-            accountReference,
-            remarks,
-          });
-
           if (!amount || !partyB || !commandID || !accountReference) {
             throw createError({
               statusCode: 400,
@@ -429,7 +402,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
             timeoutUrl,
           });
 
-          console.log("B2B Response:", response);
           return response;
         }
 
@@ -552,7 +524,6 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
               statusCode: 400,
               message:
                 "Merchant name, reference number, amount, transaction type, and credit party identifier are required",
-              data: { received: body },
             });
           }
 

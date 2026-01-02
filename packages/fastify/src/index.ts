@@ -40,7 +40,6 @@ export function createMpesa(config: MpesaConfig, options?: MpesaClientOptions) {
     fastify.post("/reversal-timeout", handlers.reversalTimeout);
     fastify.post("/status-result", handlers.statusResult);
     fastify.post("/status-timeout", handlers.statusTimeout);
-
     return fastify;
   };
 
@@ -59,8 +58,26 @@ export {
   type TransactionStatusResponse,
   type C2BRegisterRequest,
   type C2BRegisterResponse,
+  type B2CRequest,
+  type B2CResponse,
+  type B2BRequest,
+  type B2BResponse,
+  type AccountBalanceRequest,
+  type AccountBalanceResponse,
+  type GeneralTransactionStatusRequest,
+  type GeneralTransactionStatusResponse,
+  type ReversalRequest,
+  type ReversalResponse,
+  type DynamicQRRequest,
+  type DynamicQRResponse,
   type STKCallback,
   type C2BCallback,
+  type B2CCallback,
+  type B2BCallback,
+  type AccountBalanceCallback,
+  type TransactionStatusCallback,
+  type ReversalCallback,
   type ParsedCallbackData,
   type ParsedC2BCallback,
+  type CallbackHandlerOptions,
 } from "@singularity-payments/core";

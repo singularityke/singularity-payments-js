@@ -51,7 +51,6 @@ export type {
 export function createMpesa(config: MpesaConfig, options?: MpesaClientOptions) {
   const client = new MpesaClient(config, options);
   const handlers = createMpesaHandlers(client);
-
   return {
     /**
      * M-Pesa client instance for making API calls
@@ -75,8 +74,26 @@ export {
   type TransactionStatusResponse,
   type C2BRegisterRequest,
   type C2BRegisterResponse,
+  type B2CRequest,
+  type B2CResponse,
+  type B2BRequest,
+  type B2BResponse,
+  type AccountBalanceRequest,
+  type AccountBalanceResponse,
+  type GeneralTransactionStatusRequest,
+  type GeneralTransactionStatusResponse,
+  type ReversalRequest,
+  type ReversalResponse,
+  type DynamicQRRequest,
+  type DynamicQRResponse,
   type STKCallback,
   type C2BCallback,
+  type B2CCallback,
+  type B2BCallback,
+  type AccountBalanceCallback,
+  type TransactionStatusCallback,
+  type ReversalCallback,
   type ParsedCallbackData,
   type ParsedC2BCallback,
+  type CallbackHandlerOptions,
 } from "@singularity-payments/core";
