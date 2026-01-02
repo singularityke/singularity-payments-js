@@ -1,6 +1,6 @@
 {
   "name": "@singularity-payments/fastify",
-  "version": "0.1.0-alpha.2",
+  "version": "1.0.0-alpha.1",
   "publishConfig": {
     "access": "public"
   },

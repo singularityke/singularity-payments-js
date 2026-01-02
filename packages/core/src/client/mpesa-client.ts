@@ -27,6 +27,11 @@ import {
   ReversalResponse,
   DynamicQRRequest,
   DynamicQRResponse,
+  ReversalCallback,
+  TransactionStatusCallback,
+  AccountBalanceCallback,
+  B2BCallback,
+  B2CCallback,
 } from "../types/mpesa";
 import {
   MpesaValidationError,
@@ -539,6 +544,115 @@ export class MpesaClient {
       return this.rateLimiter.getUsage(key);
     }
     return null;
+  }
+  /**
+   * Handle B2C callback
+   */
+  async handleB2CCallback(callback: B2CCallback): Promise<object> {
+    try {
+      const parsed = this.callbackHandler.parseB2CCallback(callback);
+
+      if (this.callbackHandler["options"].onB2CResult) {
+        await this.callbackHandler["options"].onB2CResult(parsed);
+      }
+
+      return this.callbackHandler.createCallbackResponse(parsed.isSuccess);
+    } catch (error) {
+      console.error("B2C Callback error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Processing failed",
+      );
+    }
+  }
+
+  /**
+   * Handle B2B callback
+   */
+  async handleB2BCallback(callback: B2BCallback): Promise<object> {
+    try {
+      const parsed = this.callbackHandler.parseB2BCallback(callback);
+
+      if (this.callbackHandler["options"].onB2BResult) {
+        await this.callbackHandler["options"].onB2BResult(parsed);
+      }
+
+      return this.callbackHandler.createCallbackResponse(parsed.isSuccess);
+    } catch (error) {
+      console.error("B2B Callback error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Processing failed",
+      );
+    }
+  }
+
+  /**
+   * Handle Account Balance callback
+   */
+  async handleAccountBalanceCallback(
+    callback: AccountBalanceCallback,
+  ): Promise<object> {
+    try {
+      const parsed = this.callbackHandler.parseAccountBalanceCallback(callback);
+
+      if (this.callbackHandler["options"].onAccountBalance) {
+        await this.callbackHandler["options"].onAccountBalance(parsed);
+      }
+
+      return this.callbackHandler.createCallbackResponse(parsed.isSuccess);
+    } catch (error) {
+      console.error("Account Balance Callback error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Processing failed",
+      );
+    }
+  }
+
+  /**
+   * Handle Transaction Status callback
+   */
+  async handleTransactionStatusCallback(
+    callback: TransactionStatusCallback,
+  ): Promise<object> {
+    try {
+      const parsed =
+        this.callbackHandler.parseTransactionStatusCallback(callback);
+
+      if (this.callbackHandler["options"].onTransactionStatus) {
+        await this.callbackHandler["options"].onTransactionStatus(parsed);
+      }
+
+      return this.callbackHandler.createCallbackResponse(parsed.isSuccess);
+    } catch (error) {
+      console.error("Transaction Status Callback error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Processing failed",
+      );
+    }
+  }
+
+  /**
+   * Handle Reversal callback
+   */
+  async handleReversalCallback(callback: ReversalCallback): Promise<object> {
+    try {
+      const parsed = this.callbackHandler.parseReversalCallback(callback);
+
+      if (this.callbackHandler["options"].onReversal) {
+        await this.callbackHandler["options"].onReversal(parsed);
+      }
+
+      return this.callbackHandler.createCallbackResponse(parsed.isSuccess);
+    } catch (error) {
+      console.error("Reversal Callback error:", error);
+      return this.callbackHandler.createCallbackResponse(
+        false,
+        "Processing failed",
+      );
+    }
   }
 
   /**

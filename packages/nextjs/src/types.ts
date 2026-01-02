@@ -11,4 +11,12 @@ export interface MpesaRouteHandlers {
   b2cResult: RouteHandler;
   b2cTimeout: RouteHandler;
   catchAll: RouteHandler;
+  b2bResult: RouteHandler;
+  b2bTimeout: RouteHandler;
+  balanceResult: RouteHandler;
+  balanceTimeout: RouteHandler;
+  transactionStatusResult: RouteHandler;
+  transactionStatusTimeout: RouteHandler;
+  reversalResult: RouteHandler;
+  reversalTimeout: RouteHandler;
 }
