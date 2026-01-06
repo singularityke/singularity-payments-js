@@ -1,5 +1,11 @@
 # docs
 
+## 0.0.5
+
+### Patch Changes
+
+- 8b09dd0: NPM Registry Push
+
 ## 0.0.4
 
 ### Patch Changes

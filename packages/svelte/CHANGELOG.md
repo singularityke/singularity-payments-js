@@ -1,5 +1,13 @@
 # @singularity-payments/svelte
 
+## 1.2.4
+
+### Patch Changes
+
+- 8b09dd0: NPM Registry Push
+- Updated dependencies [8b09dd0]
+  - @singularity-payments/core@1.3.3
+
 ## 1.2.3
 
 ### Patch Changes
