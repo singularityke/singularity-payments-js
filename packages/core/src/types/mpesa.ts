@@ -280,7 +280,7 @@ export interface DynamicQRResponse {
   QRCode: string; // Base64 encoded image
 }
 export interface C2BSimulateRequest {
-  shortcode?: string;
+  shortCode?: string;
   amount: number;
   phoneNumber: string;
   billRefNumber: string;

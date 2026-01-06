@@ -52,13 +52,14 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
     simulateC2B: defineEventHandler(async (event) => {
       try {
         const body = await readBody<{
+          shortCode?: string;
           amount?: number;
           phoneNumber?: string;
           billRefNumber?: string;
           commandID?: string;
         }>(event);
 
-        const { amount, phoneNumber, billRefNumber, commandID } =
+        const { shortCode, amount, phoneNumber, billRefNumber, commandID } =
           body as C2BSimulateRequest;
 
         if (!amount || !phoneNumber || !billRefNumber) {
@@ -70,6 +71,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         }
 
         const response = await client.simulateC2B({
+          shortCode: String(shortCode),
           amount: Number(amount),
           phoneNumber: String(phoneNumber),
           billRefNumber: String(billRefNumber),
@@ -344,12 +346,13 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
         }
         if (lastSegment === "simulate-c2b") {
           const body = await readBody<{
+            shortCode?: string;
             amount?: number;
             phoneNumber?: string;
             billRefNumber?: string;
             commandID?: string;
           }>(event);
-          const { amount, phoneNumber, billRefNumber, commandID } =
+          const { shortCode, amount, phoneNumber, billRefNumber, commandID } =
             body as C2BSimulateRequest;
 
           // Validate required fields
@@ -363,6 +366,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaEventHandlers {
 
           // Call M-Pesa C2B Simulate API
           const response = await client.simulateC2B({
+            shortCode: String(shortCode),
             amount: Number(amount),
             phoneNumber: String(phoneNumber),
             billRefNumber,

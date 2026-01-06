@@ -38,7 +38,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     },
     simulateC2B: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { amount, phoneNumber, billRefNumber, commandID } =
+        const { shortCode, amount, phoneNumber, billRefNumber, commandID } =
           req.body as C2BSimulateRequest;
 
         if (!amount || !phoneNumber || !billRefNumber) {
@@ -50,6 +50,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
         }
 
         const response = await client.simulateC2B({
+          shortCode: String(shortCode),
           amount: Number(amount),
           phoneNumber: String(phoneNumber),
           billRefNumber: String(billRefNumber),
