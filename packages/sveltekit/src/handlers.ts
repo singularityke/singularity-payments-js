@@ -52,14 +52,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
     simulateC2B: {
       POST: async (event: RequestEvent) => {
         try {
-          const body = (await event.request.json()) as {
-            amount?: number;
-            phoneNumber?: string;
-            billRefNumber?: string;
-            commandID?: string;
-          };
+          const body = (await event.request.json()) as C2BSimulateRequest;
 
-          const { amount, phoneNumber, billRefNumber, commandID } =
+          const { shortCode, amount, phoneNumber, billRefNumber, commandID } =
             body as C2BSimulateRequest;
 
           if (!amount || !phoneNumber || !billRefNumber) {
@@ -73,6 +68,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
           }
 
           const response = await client.simulateC2B({
+            shortCode: String(shortCode),
             amount: Number(amount),
             phoneNumber: String(phoneNumber),
             billRefNumber: String(billRefNumber),
@@ -571,14 +567,9 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
             return json(response);
           }
           if (lastSegment === "simulate-c2b") {
-            const body = (await event.request.json()) as {
-              amount?: number;
-              phoneNumber?: string;
-              billRefNumber?: string;
-              commandID?: string;
-            };
+            const body = (await event.request.json()) as C2BSimulateRequest;
 
-            const { amount, phoneNumber, billRefNumber, commandID } =
+            const { shortCode, amount, phoneNumber, billRefNumber, commandID } =
               body as C2BSimulateRequest;
 
             // Validate required field
@@ -594,6 +585,7 @@ export function createMpesaHandlers(client: MpesaClient): MpesaRouteHandlers {
 
             // Call M-Pesa C2B Simulate API
             const response = await client.simulateC2B({
+              shortCode,
               amount,
               phoneNumber,
               billRefNumber,
