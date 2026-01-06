@@ -1,5 +1,11 @@
 # @singularity-payments/core
 
+## 1.3.3
+
+### Patch Changes
+
+- 8b09dd0: NPM Registry Push
+
 ## 1.3.2
 
 ### Patch Changes

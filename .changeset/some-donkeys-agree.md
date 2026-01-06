@@ -13,4 +13,4 @@
 "docs": patch
 ---
 
-NPM Registry Push
+Mpesa TransactionStatus Parsing corrected

@@ -499,11 +499,14 @@ export class MpesaCallbackHandler {
           case "ReceiptNo":
             parsed.receiptNo = String(param.Value);
             break;
-          case "TransactionAmount":
+          case "Amount":
             parsed.amount = Number(param.Value);
             break;
-          case "TransCompletedTime":
+          case "FinalisedTime":
             parsed.completedTime = String(param.Value);
+            break;
+          case "InitiatedTime":
+            parsed.initiatedTime = String(param.Value);
             break;
         }
       });
