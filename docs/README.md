@@ -451,7 +451,7 @@ Apache 2.0 © [Singularity Payments](LICENSE)
 - Inspired by the need for better payment integrations in Africa.
 
 ## Roadmap
-- [ ] Comprehensive Testing for all packages(currently working on tests)
+- [x] Comprehensive Testing for all packages(currently working on tests)
 - [ ]  Demo Example
 - [ ] Support for more payment providers (Airtel Money, Card Payments.)
 - [ ] React Native SDK
